@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-6" style="padding:1px;">
+            <textarea class="form-control textarea" id="SourceCode" rows="@ViewBag.Lines" style="min-width: calc(100% - 60px);">@ViewBag.Code</textarea>
+        </div>
+        <div class="col-md-6" style="padding:1px;">
+            <textarea class="form-control textarea" readonly rows="@ViewBag.Lines" style="min-width: calc(100% - 60px); cursor: text;">@ViewBag.InstrumentedCode</textarea>
+        </div>
+    </div>
+}
+<hr />
+<div class="row">
+    <div class="col-md-6 text-center" style="padding:1px;">
+        <img src="@ViewBag.CFG" />
+    </div>
+    <div class="col-md-6" style="padding:1px;">
+        @*<h4>Kemungkinan Path</h4>*@
+        <ul>
+            @foreach(string item in ViewBag.ListOfPath)
+            {
+                <li>@item</li>
+            }
+        </ul>
+    </div>
+</div>
+<script>
+    $(function () {
+        // Target a single one
+        $(".textarea").linedtextarea();
+
+    });
+</script>
