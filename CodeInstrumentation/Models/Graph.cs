@@ -17,9 +17,14 @@ namespace CodeInstrumentation.Models
         {
             Nodes.Add(node);
         }
-        public void AddEdge(Nodes from, Nodes to)
+        public void AddEdge(Nodes from, Nodes to, bool? Type)
         {
+            to.EdgeType = Type;
             from.Children.Add(to);
+        }
+        public void ModifiedNode(Nodes from, Nodes to)
+        {
+            from = to;
         }
         public void visit(Nodes node)
         {

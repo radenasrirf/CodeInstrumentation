@@ -9,5 +9,6 @@ namespace CodeInstrumentation.Models
     {
         public Nodes From { get; set; }
         public Nodes To { get; set; }
+        public bool? Type { get; set; }
     }
 }
