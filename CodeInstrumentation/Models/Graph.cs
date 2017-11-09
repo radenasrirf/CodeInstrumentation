@@ -15,12 +15,12 @@ namespace CodeInstrumentation.Models
         }
         public void AddNode(Nodes node)
         {
+            node.isVisited=false;
             Nodes.Add(node);
         }
-        public void AddEdge(Nodes from, Nodes to, bool? Type)
+        public void AddEdge(Nodes from, Edges edge)
         {
-            to.EdgeType = Type;
-            from.Children.Add(to);
+            from.Edges.Add(edge);
         }
         public void ModifiedNode(Nodes from, Nodes to)
         {
