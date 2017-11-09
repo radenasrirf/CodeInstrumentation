@@ -23,13 +23,14 @@ namespace CodeInstrumentation.Controllers
         public const int START = 0;
         public const int END = 1;
         public const int DECISSION = 2;
-        public const int PROCESS = 3;
-        public readonly string[] Shape = new string[] { "circle", "circle", "diamond height=0.7 width=1.3 ", "parallelogram  width=1.2" };
+        public const int WHILE = 3;
+        public const int PROCESS = 4;
+        public readonly string[] Shape = new string[] { "oval", "oval", "diamond height=0.6 width=1.2", "diamond height=0.6 width=1.2", "parallelogram  width=1.2" };
 
         Graph graph = new Graph();
         Nodes root = new Nodes();
         string dot = "";
-        int i = 1;
+        // int i = 1;
         int branchNumber = 1;
         string[] token = { "If", "Case", "Assignment" };
         // bool true : open, false: close, null : node
@@ -42,9 +43,9 @@ namespace CodeInstrumentation.Controllers
         string InstrumentedFilePath;
         public ActionResult Index()
         {
-            InputFilePath = Path.Combine(Server.MapPath("~/Files"), "triangle.m");
-            OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "output.xml");
-            InstrumentedFilePath = Path.Combine(Server.MapPath("~/Files"), "triangle_instrumented.m");
+            InputFilePath = Path.Combine(Server.MapPath("~/Files"), "minimaxi.m");
+            OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "minimaxi.xml");
+            InstrumentedFilePath = Path.Combine(Server.MapPath("~/Files"), "minimaxi_instrumented.m");
             ParseCodeToXML();
             BuildGraph();
             BuildPath();
@@ -65,7 +66,7 @@ namespace CodeInstrumentation.Controllers
                 dotNode += node.Number + " [shape=" + Shape[node.Type] + " label = \"" + node.Label + "\"] ";
             }
 
-            var bytes = wrapper.GenerateGraph("digraph G { graph [label=\"Orthogonal edges\" nodesep=0.8] { " + dotNode + " } " + dot + "}", Enums.GraphReturnType.Jpg);
+            var bytes = wrapper.GenerateGraph("digraph G { graph [label=\"\" nodesep=0.8] { " + dotNode + " } " + dot + "}", Enums.GraphReturnType.Jpg);
 
             var viewModel = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(bytes));
             ViewBag.CFG = viewModel;
@@ -99,34 +100,42 @@ namespace CodeInstrumentation.Controllers
             XDocument doc = XDocument.Load(OutputXMLPath);
 
             var xmlElement = doc.Root.Descendants("Function.Statements").Elements();
-            var startNode = new Nodes(i++, 0, START, "Start");
+            var startNode = new Nodes("s", 0, START, "Start");
             graph.AddNode(startNode);
             stackOfNodes.Push(startNode);
 
-            TraversedNodes(xmlElement,null);
-            graph.AddNode(new Nodes(i, System.IO.File.ReadAllLines(InputFilePath).Count(), END, "End"));
+            TraversedNodes(xmlElement, null);
+
+            var endNode = new Nodes("f", System.IO.File.ReadAllLines(InputFilePath).Count(), END, "End");
+            graph.AddNode(endNode);
             foreach (var leaf in Leafs)
             {
-                graph.AddEdge(leaf.Key, graph.Nodes.Where(x => x.Number == i).FirstOrDefault(), null);
-                dot += leaf.Key.Number + "->" + i + " [ label=\"" + leaf.Value + "\" fontsize=10  ];";
+                graph.AddEdge(leaf.Key, new Edges(endNode, leaf.Value));
+                dot += leaf.Key.Number + "-> f [ label=\"" + leaf.Value + "\" fontsize=10  ];";
             }
         }
         void BuildPath()
         {
-            TraversedPath(graph.Nodes.FirstOrDefault(), graph.Nodes.FirstOrDefault().Number.ToString());
+            stackOfNodes.Clear();
+            graph.visit(graph.Nodes.FirstOrDefault());
+            stackOfNodes.Push(graph.Nodes.FirstOrDefault());
+            TraversedPath(graph.Nodes.Where(x => x.Number != "s").FirstOrDefault(), graph.Nodes.Where(x => x.Number != "s").FirstOrDefault().Number.ToString());
         }
         void TraversedPath(Nodes nodes, string parentPath)
         {
-            if (nodes.Children.Count() > 0)
+            if (nodes == graph.Nodes.Where(x => x.Number != "f").FirstOrDefault())
             {
-                foreach (var item in nodes.Children)
+                foreach (var item in nodes.Edges)
                 {
-                    TraversedPath(item, parentPath + " - " + item.Number);
-                    graph.visit(item);
+                    if (item.To.isVisited == false)
+                        TraversedPath(item.To, parentPath + " " + (item.Type == true ? 0 : 1) + " " + (item.To.Number == "f" ? "" : item.To.Number));
                 }
+                graph.visit(nodes);
             }
             else
+            {
                 ListOfPath.Add(parentPath);
+            }
         }
         //private void TraversedNodes(IEnumerable<XElement> nodes)
         //{
@@ -264,25 +273,47 @@ namespace CodeInstrumentation.Controllers
                     el++;
                     if (element.Name == "If")
                     {
-                        var newNodes = new Nodes(i, Convert.ToInt32(element.Attribute("Line").Value), DECISSION, "B" + branchNumber++);
-                        i++;
+                        var IfPart = element.Elements().Where(x => x.Name == "If.IfPart").Elements().Elements().Where(y => y.Name.ToString().Contains("Statements")).Elements();
+                        var ElsePart = element.Elements().Where(x => x.Name == "If.ElsePart").Elements().Elements().Where(y => y.Name.ToString().Contains("Statements")).Elements();
+                        var newNodes = new Nodes(branchNumber.ToString(), Convert.ToInt32(element.Attribute("Line").Value), DECISSION, "B" + branchNumber++);
                         graph.AddNode(newNodes);
-                        graph.AddEdge(stackOfNodes.First(), newNodes, null);
+                        graph.AddEdge(stackOfNodes.First(), new Edges(newNodes, Edge));
                         dot += stackOfNodes.First().Number + "->" + newNodes.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
+
+                        if (ElsePart.Count() == 0)
+                        {
+                            graph.AddEdge(stackOfNodes.First(), new Edges(newNodes, false));
+                            dot += stackOfNodes.First().Number + "->" + newNodes.Number + " [ label=\"false\" fontsize=10 ];";
+                        }
+
                         stackOfNodes.Push(newNodes);
                         InsturmentedRow.Add(new Tuple<int, int>(Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value)));
-                        foreach (var childElement in element.Elements().Where(x => x.Name == "If.IfPart"))
+                        // if.ifpart / ifpart / ifpart statement / Elements()
+
+
+                        if (IfPart.Count() > 0)
                         {
-                            // if.ifpart / ifpart / ifpart statement / Elements()
-                            var t = childElement.Elements().Elements().Select(y => y.Name.ToString());
-                            TraversedNodes(childElement.Elements().Elements().Where(y => y.Name.ToString().Contains("Statements")).Elements(), true);
+                            TraversedNodes(IfPart, true);
                         }
-                        foreach (var childElement in element.Elements().Where(x => x.Name == "If.ElsePart"))
+                        if (ElsePart.Count() > 0)
                         {
-                            // if.ElsePart / ElsePart / ElsePart statement / Elements()
-                            var t = childElement.Elements().Elements().Select(y => y.Name.ToString());
-                            TraversedNodes(childElement.Elements().Elements().Where(y => y.Name.ToString().Contains("Statements")).Elements(), false);
+                            TraversedNodes(ElsePart, false);
                         }
+                                if (el == nodes.Count())
+                                    stackOfNodes.Pop();
+                    }
+                    if (element.Name == "While")
+                    {
+                        var newNodes = new Nodes(branchNumber.ToString(), Convert.ToInt32(element.Attribute("Line").Value), WHILE, "B" + branchNumber++);
+                        graph.AddNode(newNodes);
+                        graph.AddEdge(stackOfNodes.First(), new Edges(newNodes, Edge));
+                        dot += stackOfNodes.First().Number + "->" + newNodes.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
+                        stackOfNodes.Push(newNodes);
+                        Leafs.Add(new KeyValuePair<Nodes, bool?>(newNodes, false));
+                        InsturmentedRow.Add(new Tuple<int, int>(Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value)));
+                        TraversedNodes(element.Elements().Where(y => y.Name.ToString().Contains("Statements")).Elements(), true);
+                        graph.AddEdge(stackOfNodes.First(), new Edges(newNodes, false));
+                        dot += stackOfNodes.First().Number + "->" + newNodes.Number + " " + (Edge != null ? "[ label=\"" + false + "\" fontsize=10 ]" : "") + ";";
                         stackOfNodes.Pop();
                     }
                     else
@@ -290,11 +321,12 @@ namespace CodeInstrumentation.Controllers
                         switch (stackOfNodes.FirstOrDefault().Type)
                         {
                             case START:
+                            case DECISSION:
                                 break;
                             default:
                                 if (el == nodes.Count())
                                 {
-                                    Leafs.Add(new KeyValuePair<Nodes,bool?>(stackOfNodes.FirstOrDefault(),Edge));
+                                    Leafs.Add(new KeyValuePair<Nodes, bool?>(stackOfNodes.FirstOrDefault(), Edge));
                                 }
                                 break;
                         }
