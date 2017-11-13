@@ -15,7 +15,6 @@ namespace CodeInstrumentation.Models
         }
         public void AddNode(Nodes node)
         {
-            node.isVisited=false;
             Nodes.Add(node);
         }
         public void AddEdge(Nodes from, Edges edge)
@@ -26,9 +25,9 @@ namespace CodeInstrumentation.Models
         {
             from = to;
         }
-        public void visit(Nodes node)
+        public void setVisit(Edges edge, bool isVisited)
         {
-            node.isVisited = true;
+            edge.isVisited = isVisited;
         }
     }
 }

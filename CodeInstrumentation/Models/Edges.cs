@@ -9,8 +9,10 @@ namespace CodeInstrumentation.Models
     {
         public Nodes To { get; set; }
         public bool? Type { get; set; }
+        public bool isVisited { get; set; }
         public Edges(Nodes To, bool? Type)
         {
+            this.isVisited = false;
             this.To = To;
             this.Type = Type;
         }

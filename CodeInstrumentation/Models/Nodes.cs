@@ -7,17 +7,16 @@ namespace CodeInstrumentation.Models
 {
     public class Nodes
     {
-        public string Number { get; set; }
+        public int Number { get; set; }
         public int LineNumber { get; set; }
         public int Type { get; set; }
         public string Label { get; set; }
-        public bool isVisited { get; set; }
         public List<Edges> Edges { get; set; }
         public Nodes()
         {
             this.Edges = new List<Edges>();
         }
-        public Nodes(string Number, int LineNumber, int Type, string Label)
+        public Nodes(int Number, int LineNumber, int Type, string Label)
         {
             this.Number = Number;
             this.LineNumber = LineNumber;

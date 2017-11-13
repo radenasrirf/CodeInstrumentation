@@ -10,29 +10,21 @@
     @Scripts.Render("~/bundles/jquery")
 
 </head>
-<body>
-    @*<div class="navbar navbar-inverse navbar-fixed-top">
+<body style="background-color: #ecf0f5;">
+    <div class="container">
+        <div class="navbar navbar-default navbar-fixed-top" style="min-width: 900px; background-color: white; background-image: url(/Files/line.png); background-repeat: repeat-x;background-position:bottom">
             <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    @Html.ActionLink("Application name", "Index", "Home", null, new { @class = "navbar-brand" })
-                </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                        <li>@Html.ActionLink("About", "About", "Home")</li>
-                        <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    </ul>
-                    @Html.Partial("_LoginPartial")
+                <div class="navbar-header" style="padding-top: 20px; padding-bottom: 20px;">
+                    <img src="~/Files/icon.png" />
                 </div>
             </div>
-        </div>*@
-    <div class="container body-content">
-        @RenderBody()
+        </div>
+        <div class="container body-content">
+            <br />
+            <br />
+            <br />
+            @RenderBody()
+        </div>
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - Raden Asri Ramadhina Fitriani</p>
