@@ -57,10 +57,11 @@ namespace CodeInstrumentation.Controllers
                 var parse = ParseCodeToXML();
                 if (parse == "")
                 {
-                    BuildGraph();
+                    XDocument doc = XDocument.Load(OutputXMLPath);
+                    BuildGraph(doc.Root.Descendants("Function.Statements").Elements());
                     BuildPath();
                     ViewBag.Keterangan = PrintCode();
-                    Instrumentation();
+                    Instrumentation(doc.Root.Descendants("Function"));
                     var getStartProcessQuery = new GetStartProcessQuery();
                     var getProcessStartInfoQuery = new GetProcessStartInfoQuery();
                     var registerLayoutPluginCommand = new RegisterLayoutPluginCommand(getProcessStartInfoQuery, getStartProcessQuery);
@@ -115,11 +116,8 @@ namespace CodeInstrumentation.Controllers
                 return message;
             }
         }
-        void BuildGraph()
+        void BuildGraph(IEnumerable<XElement> xmlElement)
         {
-            XDocument doc = XDocument.Load(OutputXMLPath);
-
-            var xmlElement = doc.Root.Descendants("Function.Statements").Elements();
             var startNode = new Nodes(i++, 1, START, "Start");
             graph.AddNode(startNode);
             stackOfNodes.Push(startNode);
@@ -351,21 +349,8 @@ namespace CodeInstrumentation.Controllers
 
                             TraversedNodes(ElsePart.Elements().Elements().Where(y => y.Name.ToString().Contains("Statements")).Elements(), false);
 
-                            //if (stackOfNodes.Skip(1).FirstOrDefault() == temp)
-                            //{
-                            //    var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), END, i++.ToString());
-                            //    graph.AddNode(EndNodes);
-                            //    var leaf = Leafs.Peek();
-                            //    graph.AddEdge(leaf.Key, new Edges(EndNodes, leaf.Value));
-                            //    dot += leaf.Key.Number + "-> " + EndNodes.Number + " [ label=\"" + leaf.Value + "\" fontsize=10  ];";
-                            //    stackOfNodes.Push(EndNodes);
-                            //    Leafs.Pop();
-                            //}
-                            //else
-                            //    stackOfNodes.Pop();
-
                             Nodes EndNodes = new Nodes();
-                            if (stackOfNodes.Peek() == newNodes && stackOfNodes.Skip(1).FirstOrDefault().Type ==END )
+                            if (stackOfNodes.Peek() == newNodes && stackOfNodes.Skip(1).FirstOrDefault().Type == END)
                             {
                                 EndNodes = stackOfNodes.Skip(1).FirstOrDefault();
                                 stackOfNodes.Pop();
@@ -373,7 +358,7 @@ namespace CodeInstrumentation.Controllers
                                 stackOfNodes.Push(newNodes);
                                 stackOfNodes.Push(EndNodes);
                             }
-                            else if (stackOfNodes.Peek().Type!=END)
+                            else if (stackOfNodes.Peek().Type != END)
                             {
 
                                 EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), END, i++.ToString());
@@ -390,7 +375,7 @@ namespace CodeInstrumentation.Controllers
                                 graph.AddNode(EndNodes);
                                 stackOfNodes.Push(EndNodes);
                             }
-                            else 
+                            else
                                 EndNodes = stackOfNodes.Peek();
                             graph.AddEdge(temp, new Edges(EndNodes, false));
                             dot += temp.Number + "->" + EndNodes.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
@@ -417,7 +402,6 @@ namespace CodeInstrumentation.Controllers
                         temp.Type = PROCESS;
                         graph.ModifiedNode(stackOfNodes.Peek(), temp);
                         var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "While.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), END, i++.ToString());
-                        //Leafs.Push(new KeyValuePair<Nodes, bool?>(temp, false));
                         graph.AddNode(EndNodes);
 
                         graph.AddEdge(temp, new Edges(EndNodes, false));
@@ -454,8 +438,6 @@ namespace CodeInstrumentation.Controllers
                                         var temp = stackOfNodes.Peek();
                                         temp.LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
                                         graph.ModifiedNode(stackOfNodes.Peek(), temp);
-                                        //Leafs.Push(new KeyValuePair<Nodes, bool?>(temp, null));
-                                        //stackOfNodes.Pop();
                                     }
                                     break;
                             }
@@ -482,12 +464,6 @@ namespace CodeInstrumentation.Controllers
                         }
                     }
                 }
-                //Nodes endNode = new Nodes();
-                //else
-                //{
-                //    endNode = new Nodes(i, System.IO.File.ReadAllLines(InputFilePath).Count(), END, i++.ToString());
-                //    graph.AddNode(endNode);
-                //}
 
             }
             else
@@ -570,8 +546,12 @@ namespace CodeInstrumentation.Controllers
         //    {
         //    }
         //}
-        private void Instrumentation()
+        private void Instrumentation(IEnumerable<XElement> nodes)
         {
+            var startRow = Convert.ToInt32(nodes.FirstOrDefault().Attribute("Line").Value);
+            var startCol = Convert.ToInt32(nodes.FirstOrDefault().Attribute("Column").Value);
+            var functionOutputs = nodes.Elements().Where(x => x.Name == "Function.Outputs").Elements();
+            var temp = "";
             var lineNumber = 1;
             var startNumber = InsturmentedRow != null ? InsturmentedRow.FirstOrDefault().Item1 : lineNumber + 1;
             var i = 1;
@@ -579,18 +559,32 @@ namespace CodeInstrumentation.Controllers
             {
                 foreach (string line in System.IO.File.ReadLines(InputFilePath))
                 {
-                    if (lineNumber == startNumber)
-                        sw.WriteLine("traversedPath = [];");
-                    var row = InsturmentedRow.Where(x => x.Item1 == lineNumber).FirstOrDefault();
-                    if (row != null)
+                    if (lineNumber == startRow)
                     {
-                        var temp = "";
-                        for (int j = 1; j < row.Item2; j++)
-                            temp += "\t";
-                        sw.WriteLine(temp + "% instrument Branch # " + i);
-                        sw.WriteLine(temp + "traversedPath = [traversedPath " + i++ + "];");
+                        if (functionOutputs.Count() == 1)
+                        {
+                            temp = line.Insert((Convert.ToInt32(functionOutputs.FirstOrDefault().Attribute("Column").Value) + functionOutputs.FirstOrDefault().Descendants("Name.Ids").Elements().FirstOrDefault().Attribute("Text").Value.Length) -1, "]");
+                            temp = temp.Insert(startRow + 8, "[traversedPath,");
+                        }
+                        else
+                            temp = line.Insert(Convert.ToInt32(functionOutputs.FirstOrDefault().Attribute("Column").Value) - 1, "traversedPath,");
+                        sw.WriteLine(temp);
                     }
-                    sw.WriteLine(line);
+                    else
+                    {
+                        if (lineNumber == startNumber)
+                            sw.WriteLine("traversedPath = [];");
+                        var row = InsturmentedRow.Where(x => x.Item1 == lineNumber).FirstOrDefault();
+                        if (row != null)
+                        {
+                            temp = "";
+                            for (int j = 1; j < row.Item2; j++)
+                                temp += "\t";
+                            sw.WriteLine(temp + "% instrument Branch # " + i);
+                            sw.WriteLine(temp + "traversedPath = [traversedPath " + i++ + "];");
+                        }
+                        sw.WriteLine(line);
+                    }
                     lineNumber++;
                 }
             }
@@ -629,58 +623,5 @@ namespace CodeInstrumentation.Controllers
                 }
             }
         }
-        //private void LoadTreeFromXmlDocument(XmlDocument dom)
-        //{
-        //    try
-        //    {
-        //        // SECTION 2. Initialize the TreeView control.
-        //        treeView1.Nodes.Clear();
-
-        //        // SECTION 3. Populate the TreeView with the DOM nodes.
-        //        foreach (XmlNode node in dom.DocumentElement.ChildNodes)
-        //        {
-        //            if (node.Name == "namespace" && node.ChildNodes.Count == 0 && string.IsNullOrEmpty(GetAttributeText(node, "name")))
-        //                continue;
-        //            AddNode(treeView1.Nodes, node);
-        //        }
-
-        //        treeView1.ExpandAll();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-        //}
-
-        //static string GetAttributeText(XmlNode inXmlNode, string name)
-        //{
-        //    XmlAttribute attr = (inXmlNode.Attributes == null ? null : inXmlNode.Attributes[name]);
-        //    return attr == null ? null : attr.Value;
-        //}
-
-        //private void AddNode(List<Nodes> nodes, XmlNode inXmlNode)
-        //{
-        //    if (inXmlNode.HasChildNodes)
-        //    {
-        //        string text = GetAttributeText(inXmlNode, "name");
-        //        if (string.IsNullOrEmpty(text))
-        //            text = inXmlNode.Name;
-        //        TreeNode newNode = nodes.Add(text);
-        //        XmlNodeList nodeList = inXmlNode.ChildNodes;
-        //        for (int i = 0; i <= nodeList.Count - 1; i++)
-        //        {
-        //            XmlNode xNode = inXmlNode.ChildNodes[i];
-        //            AddNode(newNode.Nodes, xNode);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // If the node has an attribute "name", use that.  Otherwise display the entire text of the node.
-        //        string text = GetAttributeText(inXmlNode, "name");
-        //        if (string.IsNullOrEmpty(text))
-        //            text = (inXmlNode.OuterXml).Trim();
-        //        TreeNode newNode = nodes.Add(text);
-        //    }
-        //}
     }
 }
