@@ -9,6 +9,7 @@ namespace CodeInstrumentation.Models
     {
         public int Number { get; set; }
         public int LineNumber { get; set; }
+        public int ColumnNumber { get; set; }
         public int Type { get; set; }
         public string Label { get; set; }
         public List<Edges> Edges { get; set; }
@@ -16,12 +17,13 @@ namespace CodeInstrumentation.Models
         {
             this.Edges = new List<Edges>();
         }
-        public Nodes(int Number, int LineNumber, int Type, string Label)
+        public Nodes(int Number, int LineNumber, int ColumnNumber, int Type, string Label)
         {
             this.Number = Number;
             this.LineNumber = LineNumber;
-            this.Label = Label;
+            this.ColumnNumber = ColumnNumber;
             this.Type = Type;
+            this.Label = Label;
             this.Edges = new List<Edges>();
         }
     }

@@ -21,7 +21,7 @@ namespace CodeInstrumentation.Models
         {
             from.Edges.Add(edge);
         }
-        public void ModifiedNode(Nodes from, Nodes to)
+        public void UpdateNode(Nodes from, Nodes to)
         {
             from = to;
         }
