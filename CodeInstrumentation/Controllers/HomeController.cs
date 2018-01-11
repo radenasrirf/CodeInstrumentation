@@ -33,8 +33,6 @@ namespace CodeInstrumentation.Controllers
         string dot = "";
         int i = 1;
         int branchNumber = 1;
-        string[] token = { "If", "Case", "Assignment" };
-        // bool true : open, false: close, null : node
         Stack<Nodes> stackOfNodes = new Stack<Nodes>();
         Stack<KeyValuePair<Nodes, bool?>> Leafs = new Stack<KeyValuePair<Nodes, bool?>>();
         List<Tuple<int, int, string>> InsturmentedRow = new List<Tuple<int, int, string>>();
@@ -81,6 +79,7 @@ namespace CodeInstrumentation.Controllers
                     //}
 
                     var bytes = wrapper.GenerateGraph("digraph G { graph [label=\"\" nodesep=0.8] { " + dotNode + " } " + dot + "}", Enums.GraphReturnType.Jpg);
+                    //var bytes = wrapper.GenerateGraph("digraph { 1 -> 2 [ label=\"True\"  fontsize=10 ]; 1 -> 3 [ label=\"False\"  fontsize=10 ]; 2 -> 4; 3 -> 4;}", Enums.GraphReturnType.Jpg);
 
                     var viewModel = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(bytes));
                     ViewBag.CFG = viewModel;
@@ -208,8 +207,6 @@ namespace CodeInstrumentation.Controllers
 
                         if (IfPart.Count() > 0)
                         {
-                            InsturmentedRow.Add(new Tuple<int, int, string>(Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value) + 1, Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), "T"));
-                            //InsturmentedRow.Add(new Tuple<int, int, string>(Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), i.ToString()));
                             var newNodes = new Nodes(i++, Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "T");
                             graph.AddNode(newNodes);
                             graph.AddEdge(temp, new Edges(newNodes, true));
@@ -220,8 +217,6 @@ namespace CodeInstrumentation.Controllers
                         }
                         if (ElsePart.Count() > 0)
                         {
-                            InsturmentedRow.Add(new Tuple<int, int, string>(Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), "F"));
-                            //InsturmentedRow.Add(new Tuple<int, int, string>(Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), i.ToString()));
                             var newNodes = new Nodes(i++, Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "F");
                             graph.AddNode(newNodes);
                             graph.AddEdge(temp, new Edges(newNodes, false));
@@ -243,7 +238,7 @@ namespace CodeInstrumentation.Controllers
                             else if (stackOfNodes.Peek().Type != END)
                             {
 
-                                EndNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value), END, branchNumber++.ToString());
+                                EndNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value)-3, END, branchNumber++.ToString());
                                 graph.AddNode(EndNodes);
                                 stackOfNodes.Push(EndNodes);
                             }
@@ -253,15 +248,24 @@ namespace CodeInstrumentation.Controllers
                             Nodes EndNodes = new Nodes();
                             if (stackOfNodes.Peek().Type != END)
                             {
-                                EndNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value), END, branchNumber++.ToString());
+                                EndNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, branchNumber++.ToString());
                                 graph.AddNode(EndNodes);
                                 stackOfNodes.Push(EndNodes);
                             }
                             else
                                 EndNodes = stackOfNodes.Peek();
+
                             graph.AddEdge(temp, new Edges(EndNodes, false));
                             EdgeCount++;
                             dot += temp.Number + "->" + EndNodes.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
+                        }
+                        if (stackOfNodes.Peek().Type == END)
+                        {
+
+                            temp = stackOfNodes.Peek();
+                            temp.LineNumber = Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value);
+                            temp.ColumnNumber = Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) -3;
+                            graph.UpdateNode(stackOfNodes.Peek(), temp);
                         }
                     }
                     else if (element.Name == "Switch")
@@ -295,7 +299,7 @@ namespace CodeInstrumentation.Controllers
                             stackOfNodes.Push(newNodes);
                             TraversedNodes(caseElement.Elements().Where(x => x.Name == "Switch.Statements").Elements(), null);
                         }
-                        var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Column").Value), END, i++.ToString());
+                        var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
                         graph.AddNode(EndNodes);
                         stackOfNodes.Push(EndNodes);
                     }
@@ -331,7 +335,7 @@ namespace CodeInstrumentation.Controllers
                         temp = stackOfNodes.Peek();
                         temp.Type = PROCESS;
                         graph.UpdateNode(stackOfNodes.Peek(), temp);
-                        var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Column").Value), END, i++.ToString());
+                        var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
                         graph.AddNode(EndNodes);
 
                         graph.AddEdge(temp, new Edges(EndNodes, false));
@@ -340,14 +344,14 @@ namespace CodeInstrumentation.Controllers
                         stackOfNodes.Pop();
                         stackOfNodes.Push(EndNodes);
                     }
-                    else
+                    else if (element.Name == "Assignment") 
                     {
                         if (stackOfNodes.Count() > 0)
                         {
                             switch (stackOfNodes.Peek().Type)
                             {
                                 case START:
-                                    var newNodes = new Nodes(i++, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), PROCESS, "");
+                                    var newNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "");
                                     graph.AddNode(newNodes);
                                     graph.AddEdge(stackOfNodes.Peek(), new Edges(newNodes, Edge));
                                     EdgeCount++;
@@ -355,7 +359,7 @@ namespace CodeInstrumentation.Controllers
                                     stackOfNodes.Push(newNodes);
                                     break;
                                 case LOOP:
-                                    newNodes = new Nodes(i++, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), PROCESS, "");
+                                    newNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "");
                                     graph.AddNode(newNodes);
                                     graph.AddEdge(stackOfNodes.Peek(), new Edges(newNodes, Edge));
                                     EdgeCount++;
@@ -368,8 +372,8 @@ namespace CodeInstrumentation.Controllers
                                     if (el == nodes.Count())
                                     {
                                         var temp = stackOfNodes.Peek();
-                                        temp.LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
-                                        temp.ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
+                                        temp.LineNumber = Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value);
+                                        temp.ColumnNumber = Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value);
                                         graph.UpdateNode(stackOfNodes.Peek(), temp);
                                     }
                                     break;
@@ -475,7 +479,7 @@ namespace CodeInstrumentation.Controllers
             {
                 if (row.Edges.Where(y => y.Type != null).Count() > 0)
                     instRow.Add(new Instrumentation(row.LineNumber, row.ColumnNumber, "% instrument Branch # " + branchNumber++.ToString()));
-                instRow.Add(new Instrumentation(row.LineNumber, row.ColumnNumber, "traversedPath = [traversedPath '" + row.Number + " ' ];"));
+                instRow.Add(new Instrumentation(row.LineNumber + (row.Type == END ? 1 : 0), row.ColumnNumber, "traversedPath = [traversedPath '" + row.Number + " ' ];"));
                 foreach (var row2 in row.Edges.Where(y => y.Type != null))
                 {
                     instRow.Add(new Instrumentation(row2.To.LineNumber, row2.To.ColumnNumber, "traversedPath = [traversedPath '(" + row2.Type.ToString().Substring(0, 1) + ") ' ];"));
@@ -507,8 +511,8 @@ namespace CodeInstrumentation.Controllers
                             temp += "\t";
                         sw.WriteLine(temp + row.Text);
                     }
-                    if(lineNumber!=startRow)
-                    sw.WriteLine(line);
+                    if (lineNumber != startRow)
+                        sw.WriteLine(line);
                     temp = "";
                     var node = graph.Nodes.Where(x => x.LineNumber == lineNumber).FirstOrDefault();
                     if (node != null)
@@ -516,7 +520,16 @@ namespace CodeInstrumentation.Controllers
                     sc.WriteLine(line + temp);
                     lineNumber++;
                 }
+
+                foreach (var row in instRow.Where(x => x.LineNumber > System.IO.File.ReadAllLines(InputFilePath).Count()))
+                {
+                    temp = "";
+                    for (int j = 1; j < row.ColumnNumber; j++)
+                        temp += "\t";
+                    sw.WriteLine(temp + row.Text);
+                }
             }
+            
             sc.Close();
         }
         private string PrintCode()
