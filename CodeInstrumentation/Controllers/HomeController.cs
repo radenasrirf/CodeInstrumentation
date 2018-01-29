@@ -41,6 +41,7 @@ namespace CodeInstrumentation.Controllers
         string OutputXMLPath;
         string InstrumentedFilePath;
         string InformationCFGFilePath;
+        string DotFilePath;
         int EdgeCount = 0;
         public ActionResult Index()
         {
@@ -56,8 +57,8 @@ namespace CodeInstrumentation.Controllers
                 {
                     sw.Write(SourceCode);
                 }
-                var parse = ParseCodeToXML();
-                if (parse == "")
+                var parse = MatlabParser.ParseCodeToXML(InputFilePath, OutputXMLPath).ToString();
+                if (parse == "Sukses")
                 {
                     XDocument doc = XDocument.Load(OutputXMLPath);
                     BuildGraph(doc.Root.Descendants("Function.Statements").Elements());
@@ -83,6 +84,7 @@ namespace CodeInstrumentation.Controllers
 
                     var viewModel = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(bytes));
                     ViewBag.CFG = viewModel;
+                    ViewBag.Dot = ("digraph G { <br/>graph [label=\"\" nodesep=0.8]  <br/>" + dot + "}").Replace(";", ";<br/>");
                     ViewBag.InstrumentedCode = System.IO.File.ReadAllText(InstrumentedFilePath);
                     ViewBag.InformationCFG = System.IO.File.ReadAllText(InformationCFGFilePath);
                     ViewBag.LineResult = System.IO.File.ReadAllLines(InstrumentedFilePath).Count() + 1;
@@ -103,25 +105,6 @@ namespace CodeInstrumentation.Controllers
             ViewBag.EdgesCount = EdgeCount;
             return View();
         }
-        string ParseCodeToXML()
-        {
-            Result<UnitNode> result = MRecognizer.RecognizeFile(InputFilePath, true, null);
-            if (result.Report.IsOk)
-            {
-                XDocument document = NodeToXmlBuilder.Build(result.Value);
-                document.Save(OutputXMLPath);
-                return "";
-            }
-            else
-            {
-                var message = "";
-                foreach (Message m in result.Report)
-                {
-                    message += "[" + m.Severity + "] Line: [" + m.Line + "] Column: [" + m.Column + "] Text: [" + m.Text + "]</br>";
-                }
-                return message;
-            }
-        }
         void BuildGraph(IEnumerable<XElement> xmlElement)
         {
             var startNode = new Nodes(i++, 1, 1, START, "Start");
@@ -140,7 +123,7 @@ namespace CodeInstrumentation.Controllers
                     var leaf = Leafs.Peek();
                     graph.AddEdge(leaf.Key, new Edges(endNode, leaf.Value));
                     EdgeCount++;
-                    dot += leaf.Key.Number + "-> " + endNode.Number + " [ label=\"" + leaf.Value + "\" fontsize=10  ];";
+                    dot += leaf.Key.Number + "->" + endNode.Number +  (leaf.Value!=null? " [ label=\"" + leaf.Value + "\"  fontsize=10 ]":"")+";";
                     Leafs.Pop();
                 }
             }
@@ -295,7 +278,7 @@ namespace CodeInstrumentation.Controllers
                             graph.AddNode(newNodes);
                             graph.AddEdge(temp, new Edges(newNodes, null));
                             EdgeCount++;
-                            dot += temp.Number + "->" + newNodes.Number + " [ label=\"" + null + "\"  fontsize=10 ];";
+                            dot += temp.Number + "->" + newNodes.Number + ";";
                             stackOfNodes.Push(newNodes);
                             TraversedNodes(caseElement.Elements().Where(x => x.Name == "Switch.Statements").Elements(), null);
                         }
@@ -348,6 +331,7 @@ namespace CodeInstrumentation.Controllers
                     {
                         if (stackOfNodes.Count() > 0)
                         {
+                            var y =element.Elements().Elements().FirstOrDefault();
                             switch (stackOfNodes.Peek().Type)
                             {
                                 case START:
@@ -363,14 +347,15 @@ namespace CodeInstrumentation.Controllers
                                     graph.AddNode(newNodes);
                                     graph.AddEdge(stackOfNodes.Peek(), new Edges(newNodes, Edge));
                                     EdgeCount++;
-                                    dot += stackOfNodes.Peek().Number + "->" + newNodes.Number + " [ label=\"" + Edge + "\"  fontsize=10 ];";
+                                    dot += stackOfNodes.Peek().Number + "->" + newNodes.Number + (Edge!=null? " [ label=\"" + Edge + "\"  fontsize=10 ]":"")+";";
                                     stackOfNodes.Push(newNodes);
                                     break;
                                 case END:
                                     break;
                                 default:
-                                    if (el == nodes.Count())
+                                    if (el == 1)
                                     {
+                                        var z = element.Elements().Elements().FirstOrDefault();
                                         var temp = stackOfNodes.Peek();
                                         temp.LineNumber = Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value);
                                         temp.ColumnNumber = Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value);
@@ -392,7 +377,7 @@ namespace CodeInstrumentation.Controllers
                                 stackOfNodes.Pop();
                                 graph.AddEdge(leaf, new Edges(EndNodes, null));
                                 EdgeCount++;
-                                dot += leaf.Number + "-> " + EndNodes.Number + " [ fontsize=10  ];";
+                                dot += leaf.Number + "->" + EndNodes.Number + ";";
                             }
                             if (stackOfNodes.Count() > 0 && stackOfNodes.Peek().Type == IF)
                             {
@@ -482,7 +467,7 @@ namespace CodeInstrumentation.Controllers
                 instRow.Add(new Instrumentation(row.LineNumber + (row.Type == END ? 1 : 0), row.ColumnNumber, "traversedPath = [traversedPath '" + row.Number + " ' ];"));
                 foreach (var row2 in row.Edges.Where(y => y.Type != null))
                 {
-                    instRow.Add(new Instrumentation(row2.To.LineNumber, row2.To.ColumnNumber, "traversedPath = [traversedPath '(" + row2.Type.ToString().Substring(0, 1) + ") ' ];"));
+                    instRow.Add(new Instrumentation(row2.To.LineNumber + (row2.To.Type == END ? 1 : 0), row2.To.ColumnNumber, "traversedPath = [traversedPath '(" + row2.Type.ToString().Substring(0, 1) + ") ' ];"));
                 }
             }
             StreamWriter sc = System.IO.File.CreateText(InformationCFGFilePath);
