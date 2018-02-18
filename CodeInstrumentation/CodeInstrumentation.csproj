@@ -179,7 +179,6 @@
     </Compile>
     <Compile Include="MatlabParser.cs" />
     <Compile Include="Models\Edges.cs" />
-    <Compile Include="Models\Graph.cs" />
     <Compile Include="Models\Instrumentation.cs">
       <SubType>Code</SubType>
     </Compile>

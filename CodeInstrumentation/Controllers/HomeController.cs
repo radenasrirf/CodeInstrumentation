@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Matlab.Utils;
 using Matlab.Recognizer;
 using Matlab.Nodes;
 using Matlab.Info;
@@ -27,22 +26,26 @@ namespace CodeInstrumentation.Controllers
         public const int PROCESS = 5;
         public readonly string[] Shape = new string[] { "circle", "circle", "diamond height=0.6 width=1.2", "diamond height=0.6 width=1.2", "parallelogram  width=1.2" };
 
-        Graph graph = new Graph();
-        Nodes root = new Nodes();
-        Nodes end = new Nodes();
+        public List<Node> Node { get; set; }
+        List<Node> Nodes = new List<Node>();
+        Node root = new Node();
+        Node end = new Node();
         string dot = "";
         int i = 1;
         int branchNumber = 1;
-        Stack<Nodes> stackOfNodes = new Stack<Nodes>();
-        Stack<KeyValuePair<Nodes, bool?>> Leafs = new Stack<KeyValuePair<Nodes, bool?>>();
-        List<Tuple<int, int, string>> InsturmentedRow = new List<Tuple<int, int, string>>();
+        List<Instrumentation> instRow = new List<Instrumentation>();
+        List<Instrumentation> instRowLoop = new List<Instrumentation>();
+        Stack<Node> stackOfNode = new Stack<Node>();
+        Stack<KeyValuePair<Node, bool?>> Leafs = new Stack<KeyValuePair<Node, bool?>>();
+        List<string> AdjacencyList = new List<string>();
+        //List<Instrumentation> InsturmentedRow = new List<Instrumentation>();
         List<string> ListOfPath = new List<string>();
         string InputFilePath;
         string OutputXMLPath;
         string InstrumentedFilePath;
         string InformationCFGFilePath;
         string DotFilePath;
-        int EdgeCount = 0;
+        int EdgesCount = 0;
         public ActionResult Index()
         {
             OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "parsecode.xml");
@@ -61,7 +64,7 @@ namespace CodeInstrumentation.Controllers
                 if (parse == "Sukses")
                 {
                     XDocument doc = XDocument.Load(OutputXMLPath);
-                    BuildGraph(doc.Root.Descendants("Function.Statements").Elements());
+                    BuildNodes(doc.Root.Descendants("Function.Statements").Elements());
                     BuildPath();
                     ViewBag.Keterangan = PrintCode();
                     Instrumentation(doc.Root.Descendants("Function"));
@@ -74,7 +77,7 @@ namespace CodeInstrumentation.Controllers
                                                       registerLayoutPluginCommand);
 
                     var dotNode = "";
-                    //foreach (var node in graph.Nodes)
+                    //foreach (var node in Nodes)
                     //{
                     //    dotNode += node.Number + " [shape=" + Shape[node.Type] + " label = \"" + node.Label + "\"] ";
                     //}
@@ -89,6 +92,8 @@ namespace CodeInstrumentation.Controllers
                     ViewBag.InformationCFG = System.IO.File.ReadAllText(InformationCFGFilePath);
                     ViewBag.LineResult = System.IO.File.ReadAllLines(InstrumentedFilePath).Count() + 1;
                     ViewBag.ListOfPath = ListOfPath;
+                    BuildAdjacencyList();
+                    ViewBag.AdjacencyList = AdjacencyList;
                     ViewBag.Parse = "true";
                 }
                 else
@@ -101,35 +106,33 @@ namespace CodeInstrumentation.Controllers
                 ViewBag.Code = "";
                 ViewBag.Line = 25;
             }
-            ViewBag.NodesCount = graph.Nodes.Count();
-            ViewBag.EdgesCount = EdgeCount;
+            ViewBag.NodesCount = Nodes.Count();
+            ViewBag.EdgesCount = EdgesCount;
             return View();
         }
-        void BuildGraph(IEnumerable<XElement> xmlElement)
+        void BuildNodes(IEnumerable<XElement> xmlElement)
         {
-            var node = new Nodes(i++, 1, 1, START, "Start");
-            graph.AddNode(node);
-            stackOfNodes.Push(node);
+            var node = new Node(i++, 1, 1, START, "Start");
+            Nodes.Add(node);
+            stackOfNode.Push(node);
 
-            TraversedNodes(xmlElement, null);
+            TraversedNode(xmlElement, null);
 
 
-            if (stackOfNodes.Peek().Type == END)
+            if (stackOfNode.Peek().Type == END)
             {
-                node = stackOfNodes.Peek();
-                node.LineNumber = System.IO.File.ReadAllLines(InputFilePath).Count();
-                node.ColumnNumber = 1;
-                graph.UpdateNode(stackOfNodes.Peek(), node);
+                stackOfNode.Peek().LineNumber = System.IO.File.ReadAllLines(InputFilePath).Count();
+                stackOfNode.Peek().ColumnNumber = 1;
             }
             if (Leafs.Count > 0)
             {
-                var endNode = new Nodes(i, System.IO.File.ReadAllLines(InputFilePath).Count(), 1, END, "End");
-                graph.AddNode(endNode);
+                var endNode = new Node(i, System.IO.File.ReadAllLines(InputFilePath).Count(), 1, END, "End");
+                Nodes.Add(endNode);
                 while (Leafs.Count() > 0)
                 {
                     var leaf = Leafs.Peek();
-                    graph.AddEdge(leaf.Key, new Edges(endNode, leaf.Value));
-                    EdgeCount++;
+                    leaf.Key.AddEdge(new Edge(endNode, leaf.Value));
+                    EdgesCount++;
                     dot += leaf.Key.Number + "->" + endNode.Number + (leaf.Value != null ? " [ label=\"" + leaf.Value + "\"  fontsize=10 ]" : "") + ";";
                     Leafs.Pop();
                 }
@@ -137,15 +140,15 @@ namespace CodeInstrumentation.Controllers
         }
         void BuildPath()
         {
-            end = stackOfNodes.Peek();
-            stackOfNodes.Clear();
-            stackOfNodes.Push(graph.Nodes.FirstOrDefault());
-            var root = graph.Nodes.FirstOrDefault();
+            end = stackOfNode.Peek();
+            stackOfNode.Clear();
+            stackOfNode.Push(Nodes.FirstOrDefault());
+            var root = Nodes.FirstOrDefault();
             TraversedPath(root.Edges.FirstOrDefault().To, root.Edges.FirstOrDefault(), root.Number.ToString() + " " + root.Edges.FirstOrDefault().To.Number.ToString());
         }
-        void TraversedPath(Nodes node, Edges edge, string parentPath)
+        void TraversedPath(Node node, Edge edge, string parentPath)
         {
-            graph.setVisit(edge, true);
+            node.setVisit(edge, true);
             if (node.Number != end.Number)
             {
                 foreach (var item in node.Edges)
@@ -162,243 +165,242 @@ namespace CodeInstrumentation.Controllers
                 ListOfPath.Add(parentPath);
             }
         }
-        private void TraversedNodes(IEnumerable<XElement> nodes, bool? Edge)
+
+        public void BuildAdjacencyList()
         {
-            if (nodes.Count() > 0)
+            var temp = "";
+            foreach(var item in Nodes)
+            {
+                temp = item.Number.ToString();
+                foreach(var item2 in item.Edges)
+                {
+                    temp += " -> " + item2.To.Number;
+                }
+                AdjacencyList.Add(temp);
+            }
+        }
+        private void TraversedNode(IEnumerable<XElement> Node, bool? Edge)
+        {
+            if (Node.Count() > 0)
             {
                 var el = 0;
-                foreach (var element in nodes)
+                foreach (var element in Node)
                 {
                     el++;
                     if (element.Name == "If")
                     {
-                        var temp = stackOfNodes.Peek();
+                        var temp = stackOfNode.Peek();
                         if (temp.Type == PROCESS || temp.Type == END)
                         {
-                            temp.LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
-                            temp.ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
-                            temp.Type = IF;
-                            temp.Label = temp.Number.ToString();
-                            graph.UpdateNode(stackOfNodes.Peek(), temp);
+                            stackOfNode.Peek().LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
+                            stackOfNode.Peek().ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
+                            stackOfNode.Peek().Type = IF;
+                            stackOfNode.Peek().Label = temp.Number.ToString();
                         }
                         else
                         {
-                            temp = new Nodes(i, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), IF, i++.ToString());
-                            graph.AddNode(temp);
-                            graph.AddEdge(stackOfNodes.Peek(), new Edges(temp, Edge));
-                            EdgeCount++;
-                            dot += stackOfNodes.Peek().Number + "->" + temp.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
-                            stackOfNodes.Push(temp);
+                            temp = new Node(i, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), IF, i++.ToString());
+                            Nodes.Add(temp);
+                            stackOfNode.Peek().AddEdge(new Edge(temp, Edge));
+                            EdgesCount++;
+                            dot += stackOfNode.Peek().Number + "->" + temp.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
+                            stackOfNode.Push(temp);
                         }
                         var IfPart = element.Elements().Where(x => x.Name == "If.IfPart");
                         var ElsePart = element.Elements().Where(x => x.Name == "If.ElsePart");
-
-                        InsturmentedRow.Add(new Tuple<int, int, string>(Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), temp.Label));
-
                         if (IfPart.Count() > 0)
                         {
-                            var newNodes = new Nodes(i++, Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "T");
-                            graph.AddNode(newNodes);
-                            graph.AddEdge(temp, new Edges(newNodes, true));
-                            EdgeCount++;
-                            dot += temp.Number + "->" + newNodes.Number + " [ label=\"" + true + "\"  fontsize=10 ];";
-                            stackOfNodes.Push(newNodes);
-                            TraversedNodes(IfPart.Elements().Elements().Where(x => x.Name == "IfPart.Statements").Elements(), true);
+                            var newNode = new Node(i++, Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(IfPart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "T");
+                            Nodes.Add(newNode);
+                            temp.AddEdge(new Edge(newNode, true));
+                            EdgesCount++;
+                            dot += temp.Number + "->" + newNode.Number + " [ label=\"" + true + "\"  fontsize=10 ];";
+                            stackOfNode.Push(newNode);
+                            TraversedNode(IfPart.Elements().Elements().Where(x => x.Name == "IfPart.Statements").Elements(), true);
                         }
                         if (ElsePart.Count() > 0)
                         {
-                            var newNodes = new Nodes(i++, Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "F");
-                            graph.AddNode(newNodes);
-                            graph.AddEdge(temp, new Edges(newNodes, false));
-                            EdgeCount++;
-                            dot += temp.Number + "->" + newNodes.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
-                            stackOfNodes.Push(newNodes);
+                            var newNode = new Node(i++, Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "F");
+                            Nodes.Add(newNode);
+                            temp.AddEdge(new Edge(newNode, false));
+                            EdgesCount++;
+                            dot += temp.Number + "->" + newNode.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
+                            stackOfNode.Push(newNode);
 
-                            TraversedNodes(ElsePart.Elements().Elements().Where(x => x.Name == "ElsePart.Statements").Elements(), false);
+                            TraversedNode(ElsePart.Elements().Elements().Where(x => x.Name == "ElsePart.Statements").Elements(), false);
 
-                            Nodes EndNodes = new Nodes();
-                            if (stackOfNodes.Peek() == newNodes && stackOfNodes.Skip(1).FirstOrDefault().Type == END)
+                            Node EndNode = new Node();
+                            if (stackOfNode.Peek() == newNode && stackOfNode.Skip(1).FirstOrDefault().Type == END)
                             {
-                                EndNodes = stackOfNodes.Skip(1).FirstOrDefault();
-                                stackOfNodes.Pop();
-                                stackOfNodes.Pop();
-                                stackOfNodes.Push(newNodes);
-                                stackOfNodes.Push(EndNodes);
+                                EndNode = stackOfNode.Skip(1).FirstOrDefault();
+                                stackOfNode.Pop();
+                                stackOfNode.Pop();
+                                stackOfNode.Push(newNode);
+                                stackOfNode.Push(EndNode);
                             }
-                            else if (stackOfNodes.Peek().Type != END)
+                            else if (stackOfNode.Peek().Type != END)
                             {
 
-                                EndNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, branchNumber++.ToString());
-                                graph.AddNode(EndNodes);
-                                stackOfNodes.Push(EndNodes);
+                                EndNode = new Node(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, branchNumber++.ToString());
+                                 Nodes.Add(EndNode);
+                                stackOfNode.Push(EndNode);
                             }
                         }
                         else
                         {
-                            Nodes EndNodes = new Nodes();
-                            if (stackOfNodes.Peek().Type != END)
+                            Node EndNode = new Node();
+                            if (stackOfNode.Peek().Type != END)
                             {
-                                EndNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, branchNumber++.ToString());
-                                graph.AddNode(EndNodes);
-                                stackOfNodes.Push(EndNodes);
+                                EndNode = new Node(i++, Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, branchNumber++.ToString());
+                                Nodes.Add(EndNode);
+                                stackOfNode.Push(EndNode);
                             }
                             else
-                                EndNodes = stackOfNodes.Peek();
+                                EndNode = stackOfNode.Peek();
 
-                            graph.AddEdge(temp, new Edges(EndNodes, false));
-                            EdgeCount++;
-                            dot += temp.Number + "->" + EndNodes.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
+                            temp.AddEdge(new Edge(EndNode, null));
+                            EdgesCount++;
+                            dot += temp.Number + "->" + EndNode.Number + ";";
                         }
-                        if (stackOfNodes.Peek().Type == END)
-                        {
-
-                            temp = stackOfNodes.Peek();
-                            temp.LineNumber = Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value);
-                            temp.ColumnNumber = Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3;
-                            graph.UpdateNode(stackOfNodes.Peek(), temp);
-                        }
+                        if (stackOfNode.Peek().Type == END)
+                        { stackOfNode.Peek().LineNumber = Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Line").Value);
+                            stackOfNode.Peek().ColumnNumber = Convert.ToInt32(element.Elements().Where(x => x.Name == "If.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3;
+                         }
                     }
                     else if (element.Name == "Switch")
                     {
-                        var temp = stackOfNodes.Peek();
+                        var temp = stackOfNode.Peek();
                         if (temp.Type == PROCESS || temp.Type == END)
                         {
-                            temp.LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
-                            temp.ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
-                            temp.Type = IF;
-                            temp.Label = temp.Number.ToString();
-                            graph.UpdateNode(stackOfNodes.Peek(), temp);
+                            stackOfNode.Peek().LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
+                            stackOfNode.Peek().ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
+                            stackOfNode.Peek().Type = IF;
+                            stackOfNode.Peek().Label = temp.Number.ToString();
                         }
                         else
                         {
-                            temp = new Nodes(i, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), IF, i++.ToString());
-                            graph.AddNode(temp);
-                            graph.AddEdge(stackOfNodes.Peek(), new Edges(temp, Edge));
-                            EdgeCount++;
-                            dot += stackOfNodes.Peek().Number + "->" + temp.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
-                            stackOfNodes.Push(temp);
+                            temp = new Node(i, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), IF, i++.ToString());
+                            Nodes.Add(temp);
+                            stackOfNode.Peek().AddEdge(new Edge(temp, Edge));
+                            EdgesCount++;
+                            dot += stackOfNode.Peek().Number + "->" + temp.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
+                            stackOfNode.Push(temp);
                         }
                         var casePart = element.Elements().Where(x => x.Name == "Switch.CaseParts").Elements();
-                        List<Nodes> tempCase = new List<Nodes>();
+                        List<Node> tempCase = new List<Node>();
                         foreach (var caseElement in casePart)
                         {
-                            var newNodes = new Nodes(i, Convert.ToInt32(caseElement.Attribute("Line").Value), Convert.ToInt32(caseElement.Attribute("Column").Value), PROCESS, i++.ToString());
-                            graph.AddNode(newNodes);
-                            graph.AddEdge(temp, new Edges(newNodes, null));
-                            EdgeCount++;
-                            dot += temp.Number + "->" + newNodes.Number + ";";
-                            stackOfNodes.Push(newNodes);
-                            tempCase.Add(newNodes);
-                            TraversedNodes(caseElement.Elements().Where(x => x.Name == "Switch.Statements").Elements(), null);
+                            var newNode = new Node(i, Convert.ToInt32(caseElement.Attribute("Line").Value), Convert.ToInt32(caseElement.Attribute("Column").Value), PROCESS, i++.ToString());
+                            Nodes.Add(newNode);
+                            temp.AddEdge(new Edge(newNode, null));
+                            EdgesCount++;
+                            dot += temp.Number + "->" + newNode.Number + ";";
+                            stackOfNode.Push(newNode);
+                            tempCase.Add(newNode);
+                            TraversedNode(caseElement.Elements().Where(x => x.Name == "Switch.Statements").Elements(), null);
                         }
-                        var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
-                        graph.AddNode(EndNodes);
-                        stackOfNodes.Push(EndNodes);
+                        var EndNode = new Node(i, Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name == "Switch.Terminator").Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
+                        Nodes.Add(EndNode);
+                        stackOfNode.Push(EndNode);
                     }
                     else if (element.Name == "For" || element.Name == "While")
                     {
-                        var temp = stackOfNodes.Peek();
+                        var temp = stackOfNode.Peek();
 
                         if (temp.Type == PROCESS || temp.Type == END)
                         {
-                            temp.LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
-                            temp.ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
-                            temp.Type = LOOP;
-                            temp.Label = temp.Number.ToString();
-                            graph.UpdateNode(stackOfNodes.Peek(), temp);
+                            stackOfNode.Peek().LineNumber = Convert.ToInt32(element.Attribute("Line").Value);
+                            stackOfNode.Peek().ColumnNumber = Convert.ToInt32(element.Attribute("Column").Value);
+                            stackOfNode.Peek().Type = LOOP;
+                            stackOfNode.Peek().Label = temp.Number.ToString();
                         }
                         else
                         {
-                            temp = new Nodes(i, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), LOOP, i++.ToString());
-                            graph.AddNode(temp);
-                            graph.AddEdge(stackOfNodes.Peek(), new Edges(temp, Edge));
-                            EdgeCount++;
-                            dot += stackOfNodes.Peek().Number + "->" + temp.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
-                            stackOfNodes.Push(temp);
+                            temp = new Node(i, Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), LOOP, i++.ToString());
+                            Nodes.Add(temp);
+                            stackOfNode.Peek().AddEdge(new Edge(temp, Edge));
+                            EdgesCount++;
+                            dot += stackOfNode.Peek().Number + "->" + temp.Number + " " + (Edge != null ? "[ label=\"" + Edge + "\" fontsize=10 ]" : "") + ";";
+                            stackOfNode.Push(temp);
                         }
+                        TraversedNode(element.Elements().Where(x => x.Name.ToString().Contains("Statements")).Elements(), true);
+                        stackOfNode.Peek().AddEdge(new Edge(temp, null));
+                        EdgesCount++;
+                        dot += stackOfNode.Peek().Number + "->" + temp.Number + " ;";
+                        stackOfNode.Pop();
 
-                        InsturmentedRow.Add(new Tuple<int, int, string>(Convert.ToInt32(element.Attribute("Line").Value), Convert.ToInt32(element.Attribute("Column").Value), temp.Label));
-                        TraversedNodes(element.Elements().Where(x => x.Name.ToString().Contains("Statements")).Elements(), true);
-                        graph.AddEdge(stackOfNodes.Peek(), new Edges(temp, null));
-                        EdgeCount++;
-                        dot += stackOfNodes.Peek().Number + "->" + temp.Number + " ;";
-                        stackOfNodes.Pop();
-
-                        temp = stackOfNodes.Peek();
-                        temp.Type = PROCESS;
-                        graph.UpdateNode(stackOfNodes.Peek(), temp);
-                        var EndNodes = new Nodes(i, Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
-                        graph.AddNode(EndNodes);
-
-                        graph.AddEdge(temp, new Edges(EndNodes, false));
-                        EdgeCount++;
-                        dot += stackOfNodes.Peek().Number + "->" + EndNodes.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
-                        stackOfNodes.Pop();
-                        stackOfNodes.Push(EndNodes);
+                        //stackOfNode.Peek().Type = PROCESS;
+                        var EndNode = new Node(i, Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
+                        Nodes.Add(EndNode);
+                        instRowLoop.Add(new Instrumentation(EndNode.LineNumber, EndNode.ColumnNumber, "traversedPath = [traversedPath '" + stackOfNode.Peek().Number + " ' ];"));
+                
+                        stackOfNode.Peek().AddEdge(new Edge(EndNode, false));
+                        EdgesCount++;
+                        dot += stackOfNode.Peek().Number + "->" + EndNode.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
+                        stackOfNode.Pop();
+                        stackOfNode.Push(EndNode);
                     }
                     else if (element.Name == "Assignment")
                     {
-                        if (stackOfNodes.Count() > 0)
+                        if (stackOfNode.Count() > 0)
                         {
-                            var y = element.Elements().Elements().FirstOrDefault();
-                            switch (stackOfNodes.Peek().Type)
+                            var n = element.Descendants("Var").FirstOrDefault();
+                            switch (stackOfNode.Peek().Type)
                             {
                                 case START:
-                                    var newNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "");
-                                    graph.AddNode(newNodes);
-                                    graph.AddEdge(stackOfNodes.Peek(), new Edges(newNodes, Edge));
-                                    EdgeCount++;
-                                    dot += stackOfNodes.Peek().Number + "->" + newNodes.Number + ";";
-                                    stackOfNodes.Push(newNodes);
+                                    var newNode = new Node(i++, Convert.ToInt32(n.Attribute("Line").Value), Convert.ToInt32(n.Attribute("Column").Value), PROCESS, "");
+                                    Nodes.Add(newNode);
+                                    stackOfNode.Peek().AddEdge(new Edge(newNode, Edge));
+                                    EdgesCount++;
+                                    dot += stackOfNode.Peek().Number + "->" + newNode.Number + ";";
+                                    stackOfNode.Push(newNode);
                                     break;
                                 case LOOP:
-                                    newNodes = new Nodes(i++, Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "");
-                                    graph.AddNode(newNodes);
-                                    graph.AddEdge(stackOfNodes.Peek(), new Edges(newNodes, Edge));
-                                    EdgeCount++;
-                                    dot += stackOfNodes.Peek().Number + "->" + newNodes.Number + (Edge != null ? " [ label=\"" + Edge + "\"  fontsize=10 ]" : "") + ";";
-                                    stackOfNodes.Push(newNodes);
+                                    newNode = new Node(i++, Convert.ToInt32(n.Attribute("Line").Value), Convert.ToInt32(n.Attribute("Column").Value), PROCESS, "");
+                                    Nodes.Add(newNode);
+                                    stackOfNode.Peek().AddEdge(new Edge(newNode, Edge));
+                                    EdgesCount++;
+                                    dot += stackOfNode.Peek().Number + "->" + newNode.Number + (Edge != null ? " [ label=\"" + Edge + "\"  fontsize=10 ]" : "") + ";";
+                                    stackOfNode.Push(newNode);
                                     break;
                                 default:
                                     if (el == 1)
                                     {
                                         var z = element.Elements().Elements().FirstOrDefault();
-                                        var temp = stackOfNodes.Peek();
-                                        temp.LineNumber = Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Line").Value);
-                                        temp.ColumnNumber = Convert.ToInt32(element.Elements().Elements().FirstOrDefault().Attribute("Column").Value);
-                                        graph.UpdateNode(stackOfNodes.Peek(), temp);
+                                        stackOfNode.Peek().LineNumber = Convert.ToInt32(n.Attribute("Line").Value);
+                                        stackOfNode.Peek().ColumnNumber = Convert.ToInt32(n.Attribute("Column").Value);
                                     }
                                     break;
                             }
                         }
                     }
-                    if (stackOfNodes.Count() > 0)
+                    if (stackOfNode.Count() > 0)
                     {
-                        if (stackOfNodes.Peek().Type == END)
+                        if (stackOfNode.Peek().Type == END)
                         {
-                            var EndNodes = stackOfNodes.Peek();
-                            stackOfNodes.Pop();//pop yang endnodes dulu
-                            while (stackOfNodes.Count() > 0 && stackOfNodes.Peek().Type == PROCESS)
+                            var EndNode = stackOfNode.Peek();
+                            stackOfNode.Pop();//pop yang endNode dulu
+                            while (stackOfNode.Count() > 0 && stackOfNode.Peek().Type == PROCESS)
                             {
-                                var leaf = stackOfNodes.Peek();
-                                stackOfNodes.Pop();
-                                graph.AddEdge(leaf, new Edges(EndNodes, null));
-                                EdgeCount++;
-                                dot += leaf.Number + "->" + EndNodes.Number + ";";
+                                var leaf = stackOfNode.Peek();
+                                stackOfNode.Pop();
+                                leaf.AddEdge(new Edge(EndNode, null));
+                                EdgesCount++;
+                                dot += leaf.Number + "->" + EndNode.Number + ";";
                             }
                             while (Leafs.Count() > 0)
                             {
                                 var leaf = Leafs.Peek();
-                                graph.AddEdge(leaf.Key, new Edges(EndNodes, leaf.Value));
-                                EdgeCount++;
-                                dot += leaf.Key.Number + "->" + EndNodes.Number + (leaf.Value != null ? " [ label=\"" + leaf.Value + "\"  fontsize=10 ]" : "") + ";";
+                                leaf.Key.AddEdge(new Edge(EndNode, leaf.Value));
+                                EdgesCount++;
+                                dot += leaf.Key.Number + "->" + EndNode.Number + (leaf.Value != null ? " [ label=\"" + leaf.Value + "\"  fontsize=10 ]" : "") + ";";
                                 Leafs.Pop();
                             }
-                            if (stackOfNodes.Count() > 0 && stackOfNodes.Peek().Type == IF)
+                            if (stackOfNode.Count() > 0 && stackOfNode.Peek().Type == IF)
                             {
-                                stackOfNodes.Pop();//pop bukanya
+                                stackOfNode.Pop();//pop bukanya
                             }
-                            stackOfNodes.Push(EndNodes);
+                            stackOfNode.Push(EndNode);
                         }
                     }
                 }
@@ -406,22 +408,20 @@ namespace CodeInstrumentation.Controllers
             }
             else
             {
-                Leafs.Push(new KeyValuePair<Nodes, bool?>(stackOfNodes.Peek(), null));
-                stackOfNodes.Pop();
+                Leafs.Push(new KeyValuePair<Node, bool?>(stackOfNode.Peek(), null));
+                stackOfNode.Pop();
             }
         }
-        private void Instrumentation(IEnumerable<XElement> nodes)
+        private void Instrumentation(IEnumerable<XElement> Node)
         {
-            var startRow = Convert.ToInt32(nodes.FirstOrDefault().Attribute("Line").Value);
-            var startCol = Convert.ToInt32(nodes.FirstOrDefault().Attribute("Column").Value);
-            var functionOutputs = nodes.Elements().Where(x => x.Name == "Function.Outputs").Elements();
+            var startRow = Convert.ToInt32(Node.FirstOrDefault().Attribute("Line").Value);
+            var startCol = Convert.ToInt32(Node.FirstOrDefault().Attribute("Column").Value);
+            var functionOutputs = Node.Elements().Where(x => x.Name == "Function.Outputs").Elements();
             var temp = "";
             var lineNumber = 1;
             var i = 1;
             branchNumber = 1;
-            List<Instrumentation> instRow = new List<Instrumentation>();
-
-            foreach (var row in graph.Nodes)
+            foreach (var row in Nodes)
             {
                 if (row.Edges.Where(y => y.Type != null).Count() > 0)
                     instRow.Add(new Instrumentation(row.LineNumber, row.ColumnNumber, "% instrument Branch # " + branchNumber++.ToString()));
@@ -458,10 +458,19 @@ namespace CodeInstrumentation.Controllers
                             temp += "\t";
                         sw.WriteLine(temp + row.Text);
                     }
+
+                    inst = instRowLoop.Where(x => x.LineNumber == lineNumber);
+                    foreach (var row in inst)
+                    {
+                        temp = "";
+                        for (int j = 1; j < row.ColumnNumber; j++)
+                            temp += "\t";
+                        sw.WriteLine(temp + row.Text);
+                    }
                     if (lineNumber != startRow)
                         sw.WriteLine(line);
                     temp = "";
-                    var node = graph.Nodes.Where(x => x.LineNumber == lineNumber).FirstOrDefault();
+                    var node = Nodes.Where(x => x.LineNumber == lineNumber).FirstOrDefault();
                     if (node != null)
                         temp = " <b style='color:red'>Node " + node.Number + "</b>";
                     sc.WriteLine(line + temp);
@@ -486,7 +495,7 @@ namespace CodeInstrumentation.Controllers
             var i = 1;
             foreach (string line in System.IO.File.ReadLines(InputFilePath))
             {
-                var row = graph.Nodes.Where(x => x.LineNumber == lineNumber).FirstOrDefault();
+                var row = Nodes.Where(x => x.LineNumber == lineNumber).FirstOrDefault();
                 if (row != null)
                 {
                     result += "<li><b>Node " + row.Number + " : </b></li>";
@@ -498,19 +507,5 @@ namespace CodeInstrumentation.Controllers
             return result;
         }
 
-        private void ProcesNode(XmlNode node, string parentPath)
-        {
-            if (!node.HasChildNodes || ((node.ChildNodes.Count == 1) && (node.FirstChild is System.Xml.XmlText)))
-            {
-                System.Diagnostics.Debug.WriteLine(parentPath + "/" + node.Name);
-            }
-            else
-            {
-                foreach (XmlNode child in node.ChildNodes)
-                {
-                    ProcesNode(child, parentPath + "/" + node.Name);
-                }
-            }
-        }
     }
 }

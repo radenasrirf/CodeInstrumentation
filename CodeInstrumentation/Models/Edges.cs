@@ -5,12 +5,12 @@ using System.Web;
 
 namespace CodeInstrumentation.Models
 {
-    public class Edges
+    public class Edge
     {
-        public Nodes To { get; set; }
+        public Node To { get; set; }
         public bool? Type { get; set; }
         public bool isVisited { get; set; }
-        public Edges(Nodes To, bool? Type)
+        public Edge(Node To, bool? Type)
         {
             this.isVisited = false;
             this.To = To;
