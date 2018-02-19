@@ -232,6 +232,7 @@ namespace CodeInstrumentation.Controllers
                         }
                         if (ElsePart.Count() > 0)
                         {
+
                             var newNode = new Node(i++, Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(ElsePart.Elements().FirstOrDefault().Attribute("Column").Value), PROCESS, "F");
                             Nodes.Add(newNode);
                             temp.AddEdge(new Edge(newNode, false));
@@ -342,15 +343,26 @@ namespace CodeInstrumentation.Controllers
                         stackOfNode.Pop();
 
                         //stackOfNode.Peek().Type = PROCESS;
-                        var EndNode = new Node(i, Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
-                        Nodes.Add(EndNode);
+                        Node EndNode = new Node();
+                        if (stackOfNode.Peek() == temp && stackOfNode.Skip(1).FirstOrDefault().Type == END)
+                        {
+                            EndNode = stackOfNode.Skip(1).FirstOrDefault();
+                            stackOfNode.Pop();
+                            stackOfNode.Pop();
+                            stackOfNode.Push(EndNode);
+                        }
+                        else if (stackOfNode.Peek().Type != END)
+                        {
+                            EndNode = new Node(i, Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Line").Value), Convert.ToInt32(element.Elements().Where(x => x.Name.ToString().Contains("Terminator")).Elements().FirstOrDefault().Attribute("Column").Value) - 3, END, i++.ToString());
+                            Nodes.Add(EndNode);
+                            stackOfNode.Pop();
+                            stackOfNode.Push(EndNode);
+                        }
                         instRowLoop.Add(new Instrumentation(EndNode.LineNumber, EndNode.ColumnNumber, "traversedPath = [traversedPath '" + stackOfNode.Peek().Number + " ' ];"));
                 
-                        stackOfNode.Peek().AddEdge(new Edge(EndNode, false));
+                        temp.AddEdge(new Edge(EndNode, false));
                         EdgesCount++;
-                        dot += stackOfNode.Peek().Number + "->" + EndNode.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
-                        stackOfNode.Pop();
-                        stackOfNode.Push(EndNode);
+                        dot += temp.Number + "->" + EndNode.Number + " [ label=\"" + false + "\"  fontsize=10 ];";
                     }
                     else// if (element.Name == "Assignment")
                     {
