@@ -207,6 +207,7 @@ namespace CodeInstrumentation.Controllers
                             stackOfNode.Push(temp);
                         }
                         var IfPart = element.Elements().Where(x => x.Name == "If.IfPart");
+                        var ElseIfPart = element.Elements().Where(x => x.Name == "If.ElseIfParts");
                         var ElsePart = element.Elements().Where(x => x.Name == "If.ElsePart");
                         if (IfPart.Count() > 0)
                         {
@@ -217,6 +218,17 @@ namespace CodeInstrumentation.Controllers
                             dot += temp.Number + "->" + newNode.Number + " [ label=\"" + true + "\"  fontsize=10 ];";
                             stackOfNode.Push(newNode);
                             TraversedNode(IfPart.Elements().Elements().Where(x => x.Name == "IfPart.Statements").Elements(), true);
+                        }
+
+                        foreach (var item in ElseIfPart.Elements())
+                        {
+                            var newNode = new Node(i++, Convert.ToInt32(item.Attribute("Line").Value), Convert.ToInt32(item.Attribute("Column").Value), PROCESS, "T");
+                            Nodes.Add(newNode);
+                            temp.AddEdge(new Edge(newNode, true));
+                            EdgesCount++;
+                            dot += temp.Number + "->" + newNode.Number + " [ label=\"" + true + "\"  fontsize=10 ];";
+                            stackOfNode.Push(newNode);
+                            TraversedNode(item.Elements().Where(x => x.Name == "ElseIfPart.Statements").Elements(), true);
                         }
                         if (ElsePart.Count() > 0)
                         {
@@ -340,11 +352,15 @@ namespace CodeInstrumentation.Controllers
                         stackOfNode.Pop();
                         stackOfNode.Push(EndNode);
                     }
-                    else if (element.Name == "Assignment")
+                    else// if (element.Name == "Assignment")
                     {
                         if (stackOfNode.Count() > 0)
                         {
-                            var n = element.Descendants("Var").FirstOrDefault();
+                            XElement n;
+                             if (element.Name == "Assignment")
+                                n = element.Descendants("Var").FirstOrDefault();
+                             else 
+                                n = element;
                             switch (stackOfNode.Peek().Type)
                             {
                                 case START:
