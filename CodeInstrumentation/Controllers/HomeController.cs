@@ -358,7 +358,7 @@ namespace CodeInstrumentation.Controllers
                             stackOfNode.Pop();
                             stackOfNode.Push(EndNode);
                         }
-                        instRowLoop.Add(new Instrumentation(EndNode.LineNumber, EndNode.ColumnNumber, "traversedPath = [traversedPath '" + stackOfNode.Peek().Number + " ' ];"));
+                        instRowLoop.Add(new Instrumentation(EndNode.LineNumber, EndNode.ColumnNumber, "traversedPath = [traversedPath '" + temp.Number + " ' ];"));
                 
                         temp.AddEdge(new Edge(EndNode, false));
                         EdgesCount++;
