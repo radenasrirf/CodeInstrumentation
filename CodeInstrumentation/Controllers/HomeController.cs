@@ -48,6 +48,7 @@ namespace CodeInstrumentation.Controllers
         int EdgesCount = 0;
         public ActionResult Index()
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "parsecode.xml");
             InstrumentedFilePath = Path.Combine(Server.MapPath("~/Files"), "instrumentedcode.m");
             InformationCFGFilePath = Path.Combine(Server.MapPath("~/Files"), "InformationCFGFilePath.m");
@@ -108,6 +109,9 @@ namespace CodeInstrumentation.Controllers
             }
             ViewBag.NodesCount = Nodes.Count();
             ViewBag.EdgesCount = EdgesCount;
+            
+            watch.Stop();
+            ViewBag.ExecTime = Math.Round(watch.Elapsed.TotalSeconds, 2);
             return View();
         }
         void BuildNodes(IEnumerable<XElement> xmlElement)
@@ -461,6 +465,7 @@ namespace CodeInstrumentation.Controllers
                 }
             }
             StreamWriter sc = System.IO.File.CreateText(InformationCFGFilePath);
+            //StreamWriter sci = System.IO.File.CreateText(InformationCFGFilePath);
             using (StreamWriter sw = System.IO.File.CreateText(InstrumentedFilePath))
             {
                 foreach (string line in System.IO.File.ReadLines(InputFilePath))

@@ -1,37 +1,30 @@
-function [traversedPath,type] = triangle(sideLengths) 
+function [traversedPath,sortedArray] = insertion(anyArray)
 traversedPath = [];
 traversedPath = [traversedPath '1 ' ];
-	A = sideLengths(1); % First side
-	B = sideLengths(2); % Second side
-	C = sideLengths(3); % Third side
+	k = 1; % The smallest integer increment
+	n = length(anyArray);
+	i = 2;
 	% instrument Branch # 1
 	traversedPath = [traversedPath '2 ' ];
-	if ((A+B > C) && (B+C > A) && (C+A > B)) 
+	for i=2:n 
+		x = anyArray(i);
+		j = i + 1;
 		traversedPath = [traversedPath '(T) ' ];
 		% instrument Branch # 2
 		traversedPath = [traversedPath '3 ' ];
-		if ((A ~= B) && (B ~= C) && (C ~= A)) 
+		while ((j > 0) & (anyArray(j) > x)),
 			traversedPath = [traversedPath '(T) ' ];
 			traversedPath = [traversedPath '4 ' ];
-			type = 'Scalene'; 
-		else
-	traversedPath = [traversedPath '(F) ' ];
-	% instrument Branch # 3
-	traversedPath = [traversedPath '5 ' ];
-	if (((A == B) && (B ~= C)) || ((B == C) && (C ~= A)) || ((C == A) && (A ~= B))) 
-				traversedPath = [traversedPath '(T) ' ];
-				traversedPath = [traversedPath '6 ' ];
-				type = 'Isosceles'; 
-			else
-				traversedPath = [traversedPath '(F) ' ];
-				traversedPath = [traversedPath '7 ' ];
-				type = 'Equilateral'; 
-			end
+			anyArray(j+1) = anyArray(j);
+			j = j - 1;
+		traversedPath = [traversedPath '3 ' ];
 		end
-	else
 		traversedPath = [traversedPath '(F) ' ];
-		traversedPath = [traversedPath '9 ' ];
-		type = 'Not a triangle'; 
+		traversedPath = [traversedPath '5 ' ];
+		anyArray(j+1) = x;
+	traversedPath = [traversedPath '2 ' ];
 	end
-traversedPath = [traversedPath '8 ' ];
-end 
+	sortedArray = anyArray;
+traversedPath = [traversedPath '(F) ' ];
+traversedPath = [traversedPath '6 ' ];
+end

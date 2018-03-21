@@ -1,18 +1,15 @@
-function type = triangle(sideLengths) 
-	A = sideLengths(1); % First side
-	B = sideLengths(2); % Second side
-	C = sideLengths(3); % Third side
-	if ((A+B > C) && (B+C > A) && (C+A > B)) 
-		if ((A ~= B) && (B ~= C) && (C ~= A)) 
-			type = 'Scalene'; 
-		else
-	if (((A == B) && (B ~= C)) || ((B == C) && (C ~= A)) || ((C == A) && (A ~= B))) 
-				type = 'Isosceles'; 
-			else
-				type = 'Equilateral'; 
-			end
+function sortedArray = insertion(anyArray)
+	k = 1; % The smallest integer increment
+	n = length(anyArray);
+	i = 2;
+	for i=2:n 
+		x = anyArray(i);
+		j = i + 1;
+		while ((j > 0) & (anyArray(j) > x)),
+			anyArray(j+1) = anyArray(j);
+			j = j - 1;
 		end
-	else
-		type = 'Not a triangle'; 
+		anyArray(j+1) = x;
 	end
-end 
+	sortedArray = anyArray;
+end

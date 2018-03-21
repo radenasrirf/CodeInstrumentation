@@ -1,18 +1,15 @@
-function type = triangle(sideLengths)  <b style='color:red'>Node 1</b>
-	A = sideLengths(1); % First side
-	B = sideLengths(2); % Second side
-	C = sideLengths(3); % Third side
-	if ((A+B > C) && (B+C > A) && (C+A > B))  <b style='color:red'>Node 2</b>
-		if ((A ~= B) && (B ~= C) && (C ~= A))  <b style='color:red'>Node 3</b>
-			type = 'Scalene';  <b style='color:red'>Node 4</b>
-		else
-	if (((A == B) && (B ~= C)) || ((B == C) && (C ~= A)) || ((C == A) && (A ~= B)))  <b style='color:red'>Node 5</b>
-				type = 'Isosceles';  <b style='color:red'>Node 6</b>
-			else
-				type = 'Equilateral';  <b style='color:red'>Node 7</b>
-			end
-		end
-	else
-		type = 'Not a triangle';  <b style='color:red'>Node 9</b>
+function sortedArray = insertion(anyArray) <b style='color:red'>Node 1</b>
+	k = 1; % The smallest integer increment
+	n = length(anyArray);
+	i = 2;
+	for i=2:n  <b style='color:red'>Node 2</b>
+		x = anyArray(i);
+		j = i + 1;
+		while ((j > 0) & (anyArray(j) > x)), <b style='color:red'>Node 3</b>
+			anyArray(j+1) = anyArray(j); <b style='color:red'>Node 4</b>
+			j = j - 1;
+		end <b style='color:red'>Node 5</b>
+		anyArray(j+1) = x;
 	end
-end  <b style='color:red'>Node 8</b>
+	sortedArray = anyArray;
+end <b style='color:red'>Node 6</b>
