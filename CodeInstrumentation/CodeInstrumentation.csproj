@@ -179,12 +179,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="MatlabParser.cs" />
-    <Compile Include="Models\Edges.cs" />
+    <Compile Include="Matlab.cs" />
+    <Compile Include="Models\Edge.cs" />
     <Compile Include="Models\Instrumentation.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\Nodes.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -238,7 +238,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <PropertyGroup>

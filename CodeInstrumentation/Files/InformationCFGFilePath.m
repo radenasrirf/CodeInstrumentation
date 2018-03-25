@@ -1,15 +1,21 @@
-function sortedArray = insertion(anyArray) <b style='color:red'>Node 1</b>
-	k = 1; % The smallest integer increment
-	n = length(anyArray);
-	i = 2;
-	for i=2:n  <b style='color:red'>Node 2</b>
-		x = anyArray(i);
-		j = i + 1;
-		while ((j > 0) & (anyArray(j) > x)), <b style='color:red'>Node 3</b>
-			anyArray(j+1) = anyArray(j); <b style='color:red'>Node 4</b>
-			j = j - 1;
-		end <b style='color:red'>Node 5</b>
-		anyArray(j+1) = x;
+function branchVal = fitnessMiniMaxi(branchNo, predicate) <b style='color:red'>Models.Node 1</b>
+	k = 1; % the smallest step for integer
+	switch (branchNo) <b style='color:red'>Models.Node 2</b>
+	case 1,
+		% branch #1: (idx <= numLength) <b style='color:red'>Models.Node 3</b>
+		branchVal = predicate(1) - predicate(2);
+	case 2,
+		% branch #2: (maxi < num(idx)) <b style='color:red'>Models.Node 4</b>
+		branchVal = predicate(1) - predicate(2);
+	case 3,
+		% branch #3: (mini > num(idx)) <b style='color:red'>Models.Node 5</b>
+		branchVal = predicate(2) - predicate(1);
 	end
-	sortedArray = anyArray;
-end <b style='color:red'>Node 6</b>
+	if ((branchNo == 2) || (branchNo == 3)), <b style='color:red'>Models.Node 6</b>
+		if (branchVal < 0) <b style='color:red'>Models.Node 7</b>
+			branchVal = branchVal - k; <b style='color:red'>Models.Node 8</b>
+		else
+			branchVal = branchVal + k; <b style='color:red'>Models.Node 9</b>
+		end
+	end
+end <b style='color:red'>Models.Node 10</b>
