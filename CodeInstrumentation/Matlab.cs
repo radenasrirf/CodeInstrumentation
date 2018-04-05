@@ -451,6 +451,8 @@ namespace CodeInstrumentation
                         for (int j = 1; j < row.ColumnNumber; j++)
                             temp += "\t";
                         sw.WriteLine(temp + row.Text);
+                        for (int j = 1; j < 5000; j++)
+                            temp += "\t";
                     }
 
                     inst = instRowLoop.Where(x => x.LineNumber == lineNumber);
@@ -466,7 +468,7 @@ namespace CodeInstrumentation
                     temp = "";
                     var node = Nodes.Where(x => x.LineNumber == lineNumber).FirstOrDefault();
                     if (node != null)
-                        temp = " <b style='color:red'>Models.Node " + node.Number + "</b>";
+                        temp = " <b style='color:red'>Node " + node.Number + "</b>";
                     sc.WriteLine(line + temp);
                     lineNumber++;
                 }

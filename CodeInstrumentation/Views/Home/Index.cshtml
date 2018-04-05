@@ -90,8 +90,8 @@
                                 <h3 class="box-title"><i class="glyphicon glyphicon-info-sign"></i> &nbsp; Cyclomatic Complexity</h3>
                             </div>
                             <div class="box-body">
-                                Nodes(N) = @ViewBag.NodesCount<br/>
-                                Edges(E) = @ViewBag.EdgesCount<br/>
+                                N(G) = @ViewBag.NodesCount<br/>
+                                E(G) = @ViewBag.EdgesCount<br/>
                                 V(G) = E - N + 2<br />
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= @(ViewBag.EdgesCount - ViewBag.NodesCount + 2)
                             </div><!-- /.box-body-->
@@ -105,12 +105,12 @@
                                 <h3 class="box-title"><i class="glyphicon glyphicon-list"></i> &nbsp;  Path</h3>
                             </div>
                             <div class="box-body">
-                                <ul>
+                                <ol>
                                     @foreach (string item in ViewBag.ListOfPath)
                                     {
                                         <li>@item</li>
                                     }
-                                </ul>
+                                </ol>
                             </div><!-- /.box-body-->
                         </div><!-- /.box -->
                     </div>

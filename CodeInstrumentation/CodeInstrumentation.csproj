@@ -193,6 +193,34 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\jquery-linedtextarea.css" />
     <Content Include="favicon.ico" />
+    <Content Include="Files\10_tMA2004.m" />
+    <Content Include="Files\11_eiR1985.m" />
+    <Content Include="Files\12_qG1997.m" />
+    <Content Include="Files\13_ttB2002.m" />
+    <Content Include="Files\14_eiB2002.m" />
+    <Content Include="Files\15_qB2002.m" />
+    <Content Include="Files\16_scB2002.m" />
+    <Content Include="Files\17_fcB2002.m" />
+    <Content Include="Files\18_fB2002.m" />
+    <Content Include="Files\19_bG2011.m" />
+    <Content Include="Files\1_tA2008.m" />
+    <Content Include="Files\20_fG2011.m" />
+    <Content Include="Files\21_sG2011.m" />
+    <Content Include="Files\22_FitnessFunction.m" />
+    <Content Include="Files\2_mmA2008.m" />
+    <Content Include="Files\3_iA2008.m" />
+    <Content Include="Files\4_bisA2008.m" />
+    <Content Include="Files\5_binA2008.m" />
+    <Content Include="Files\6_bubA2008.m" />
+    <Content Include="Files\7_gA2008.m" />
+    <Content Include="Files\8_rA2008.m" />
+    <Content Include="Files\9_mtA2008.m" />
+    <Content Include="Files\icon.png" />
+    <Content Include="Files\InformationCFGFilePath.m" />
+    <Content Include="Files\instrumentedcode.m" />
+    <Content Include="Files\line.png" />
+    <Content Include="Files\parsecode.xml" />
+    <Content Include="Files\sourcecode.m" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -231,7 +259,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Files\" />
     <Folder Include="Helper\" />
   </ItemGroup>
   <ItemGroup>
