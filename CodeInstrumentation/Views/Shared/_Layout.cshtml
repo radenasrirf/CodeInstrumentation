@@ -4,33 +4,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Instrumentator and CFG Generator</title>
+    @Styles.Render("~/Content/fonts")
     @Scripts.Render("~/bundles/jquery")
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/modernizr")
 
 </head>
-<body style="background-color: #ecf0f5;">
-    <div class="container">
-        <div class="navbar navbar-default navbar-fixed-top" style="min-width: 900px; background-color: white; background-image: url(/Files/line.png); background-repeat: repeat-x;background-position:bottom">
-            <div class="container">
-                <div class="navbar-header" style="padding-top: 20px; padding-bottom: 20px;">
-                    <img src="~/Files/icon.png" />
-                </div>
+<body style="background-color: #ecf0f5; padding:0;">
+    <div class="navbar navbar-default navbar-fixed-top" style="min-width: 900px; background-color: white; background-image: url(/Files/line.png); background-repeat: repeat-x;background-position:bottom">
+        <div class="container">
+            <div class="navbar-header" style="padding-top: 10px; padding-bottom: 10px;">
+                <img src="~/Files/icon.png" />
             </div>
         </div>
-        <div class="container body-content">
-            <br />
-            <br />
-            <br />
-            @RenderBody()
-        </div>
-        <hr />
-        <footer>
-            <p class="col-md-8">&copy; @DateTime.Now.Year - Raden Asri Ramadhina Fitriani. Computer Science. Bogor Agricultural University.</p>
-            <p class="text-right col-md-4" style="font-size:xx-small">Execute Time: @ViewBag.ExecTIme ms</p>
-        </footer>
     </div>
+    <div class="container body-content">
+        <br />
+        @RenderBody()
+    </div>
+    <hr />
+    <footer>
+        <div class="container">
+            <div class="row">
+                <p class="col-md-8" style="font-size:small">&copy; @DateTime.Now.Year - Raden Asri Ramadhina Fitriani. Computer Science. Bogor Agricultural University.</p>
+                <p class="text-right col-md-4" style="font-size:small">Execute Time: @ViewBag.ExecTIme ms</p>
+            </div>
+        </div>
+    </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

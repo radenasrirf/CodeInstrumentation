@@ -20,20 +20,68 @@ namespace CodeInstrumentation.Controllers
     public class HomeController : Controller
     {
         Matlab matlab = new Matlab();
-        public ActionResult Index()
+        public ActionResult Index(HttpPostedFileBase file)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            matlab.OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "parsecode.xml");
-            matlab.InstrumentedFilePath = Path.Combine(Server.MapPath("~/Files"), "instrumentedcode.m");
-            matlab.InformationCFGFilePath = Path.Combine(Server.MapPath("~/Files"), "InformationCFGFilePath.m");
-            var SourceCode = "";
-            if (Request["SourceCode"] != null)
+            var InstPath = "";
+            ViewBag.Code = "";
+            ViewBag.Line = 15;
+            if (Request["type"] != null)
             {
-                SourceCode = Request["SourceCode"].ToString();
-                matlab.InputFilePath = Path.Combine(Server.MapPath("~/Files"), "sourcecode.m");
-                using (StreamWriter sw = System.IO.File.CreateText(matlab.InputFilePath))
+                if (Request["type"] == "file")
                 {
-                    sw.Write(SourceCode);
+                    if (file == null)
+                    {
+                        ViewBag.Error = "Source code is requiered.";
+                        watch.Stop();
+                        ViewBag.ExecTime = Math.Round(watch.Elapsed.TotalSeconds, 2);
+                        return View();
+                    }
+                    else
+                    {
+
+                        var fileExt = System.IO.Path.GetExtension(file.FileName).Substring(1);
+
+                        var tipeFile = new[] { "m" };
+                        if (!tipeFile.Contains(fileExt))
+                        {
+                            ViewBag.Error = "The file type is not supported";
+                            watch.Stop();
+                            ViewBag.ExecTime = Math.Round(watch.Elapsed.TotalSeconds, 2);
+                            return View();
+                        }
+                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var path = Path.Combine(Server.MapPath("~/Files/"), "sourcecode_" + fileName + ".m");
+                        file.SaveAs(path);
+                        matlab.InputFilePath = Path.Combine(Server.MapPath("~/Files"), "sourcecode_" + fileName + ".m");
+                        matlab.OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "parsecode_" + fileName + ".xml");
+                        matlab.InstrumentedFilePath = Path.Combine(Server.MapPath("~/Files"), "instrumentedcode._" + fileName + ".m");
+                        InstPath = "instrumentedcode._" + fileName + ".m";
+                        matlab.InformationCFGFilePath = Path.Combine(Server.MapPath("~/Files"), "informationCFGFilePath_" + fileName + ".m");
+                    }
+                }
+                else
+                {
+                    if (Request["SourceCode"] == null || Request["SourceCode"].ToString() == "")
+                    {
+                        ViewBag.Error = "Source code is requiered.";
+                        watch.Stop();
+                        ViewBag.ExecTime = Math.Round(watch.Elapsed.TotalSeconds, 2);
+                        return View();
+                    }
+                    else
+                    {
+                        matlab.OutputXMLPath = Path.Combine(Server.MapPath("~/Files"), "parsecode.xml");
+                        matlab.InstrumentedFilePath = Path.Combine(Server.MapPath("~/Files"), "instrumentedcode.m");
+                        InstPath = "instrumentedcode.m";
+                        matlab.InformationCFGFilePath = Path.Combine(Server.MapPath("~/Files"), "informationCFGFilePath.m");
+                        matlab.InputFilePath = Path.Combine(Server.MapPath("~/Files"), "sourcecode.m");
+                        var SourceCode = Request["SourceCode"].ToString();
+                        using (StreamWriter sw = System.IO.File.CreateText(matlab.InputFilePath))
+                        {
+                            sw.Write(SourceCode);
+                        }
+                    }
                 }
                 var parse = Matlab.ParseCodeToXML(matlab.InputFilePath, matlab.OutputXMLPath).ToString();
                 if (parse == "Sukses")
@@ -75,18 +123,19 @@ namespace CodeInstrumentation.Controllers
                     ViewBag.Parse = parse;
                 ViewBag.Code = System.IO.File.ReadAllText(matlab.InputFilePath);
                 ViewBag.Line = System.IO.File.ReadAllLines(matlab.InputFilePath).Count() + 1;
+                ViewBag.NodesCount = matlab.Nodes.Count();
+                ViewBag.EdgesCount = matlab.EdgesCount;
             }
-            else
-            {
-                ViewBag.Code = "";
-                ViewBag.Line = 25;
-            }
-            ViewBag.NodesCount = matlab.Nodes.Count();
-            ViewBag.EdgesCount = matlab.EdgesCount;
-
+            ViewBag.InstrumentedFilePath = InstPath;
             watch.Stop();
             ViewBag.ExecTime = Math.Round(watch.Elapsed.TotalSeconds, 2);
             return View();
+        }
+        public ActionResult Download()
+        {
+            byte[] fileBytes = System.IO.File.ReadAllBytes(Path.Combine(Server.MapPath("~/Files"), Request["InstrumentedFilePath"].ToString()));
+            string fileName = Request["InstrumentedFilePath"].ToString();
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
         public string PrintCode()

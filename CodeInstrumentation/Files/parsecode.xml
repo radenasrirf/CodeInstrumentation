@@ -8,18 +8,27 @@
       <FunctionFile.Functions>
         <Function Line="1" Column="1" Text="function">
           <Function.Name>
-            <Name Line="1" Column="17" Text="">
+            <Name Line="1" Column="22" Text="">
               <Name.Ids>
-                <Id Line="1" Column="17" Text="triangle" />
+                <Id Line="1" Column="22" Text="fitnessMiniMaxi" />
               </Name.Ids>
             </Name>
           </Function.Name>
           <Function.Inputs>
-            <Input Line="1" Column="26" Text="">
+            <Input Line="1" Column="38" Text="">
               <Input.Name>
-                <Name Line="1" Column="26" Text="">
+                <Name Line="1" Column="38" Text="">
                   <Name.Ids>
-                    <Id Line="1" Column="26" Text="sideLengths" />
+                    <Id Line="1" Column="38" Text="branchNo" />
+                  </Name.Ids>
+                </Name>
+              </Input.Name>
+            </Input>
+            <Input Line="1" Column="48" Text="">
+              <Input.Name>
+                <Name Line="1" Column="48" Text="">
+                  <Name.Ids>
+                    <Id Line="1" Column="48" Text="predicate" />
                   </Name.Ids>
                 </Name>
               </Input.Name>
@@ -30,7 +39,7 @@
               <Output.Name>
                 <Name Line="1" Column="10" Text="">
                   <Name.Ids>
-                    <Id Line="1" Column="10" Text="type" />
+                    <Id Line="1" Column="10" Text="branchVal" />
                   </Name.Ids>
                 </Name>
               </Output.Name>
@@ -43,620 +52,398 @@
                   <Var.Name>
                     <Name Line="2" Column="2" Text="">
                       <Name.Ids>
-                        <Id Line="2" Column="2" Text="A" />
+                        <Id Line="2" Column="2" Text="k" />
                       </Name.Ids>
                     </Name>
                   </Var.Name>
                 </Var>
               </Assignment.LValue>
               <Assignment.Value>
-                <Parenthesis Line="2" Column="17" Text="(">
-                  <Parenthesis.Operand>
-                    <Var Line="2" Column="6" Text="">
+                <Real Line="2" Column="6" Text="1" />
+              </Assignment.Value>
+              <Assignment.Terminator>
+                <NoPrint Line="2" Column="7" Text=";" />
+              </Assignment.Terminator>
+            </Assignment>
+            <Switch Line="3" Column="2" Text="switch">
+              <Switch.SwitchPart>
+                <SwitchPart Line="3" Column="2" Text="switch">
+                  <SwitchPart.Expression>
+                    <Var Line="3" Column="10" Text="">
                       <Var.Name>
-                        <Name Line="2" Column="6" Text="">
+                        <Name Line="3" Column="10" Text="">
                           <Name.Ids>
-                            <Id Line="2" Column="6" Text="sideLengths" />
+                            <Id Line="3" Column="10" Text="branchNo" />
                           </Name.Ids>
                         </Name>
                       </Var.Name>
                     </Var>
-                  </Parenthesis.Operand>
-                  <Parenthesis.Arguments>
-                    <Real Line="2" Column="18" Text="1" />
-                  </Parenthesis.Arguments>
-                </Parenthesis>
-              </Assignment.Value>
-              <Assignment.Terminator>
-                <NoPrint Line="2" Column="20" Text=";" />
-              </Assignment.Terminator>
-            </Assignment>
-            <Assignment Line="3" Column="4" Text="=">
-              <Assignment.LValue>
-                <Var Line="3" Column="2" Text="">
-                  <Var.Name>
-                    <Name Line="3" Column="2" Text="">
-                      <Name.Ids>
-                        <Id Line="3" Column="2" Text="B" />
-                      </Name.Ids>
-                    </Name>
-                  </Var.Name>
-                </Var>
-              </Assignment.LValue>
-              <Assignment.Value>
-                <Parenthesis Line="3" Column="17" Text="(">
-                  <Parenthesis.Operand>
-                    <Var Line="3" Column="6" Text="">
-                      <Var.Name>
-                        <Name Line="3" Column="6" Text="">
-                          <Name.Ids>
-                            <Id Line="3" Column="6" Text="sideLengths" />
-                          </Name.Ids>
-                        </Name>
-                      </Var.Name>
-                    </Var>
-                  </Parenthesis.Operand>
-                  <Parenthesis.Arguments>
-                    <Real Line="3" Column="18" Text="2" />
-                  </Parenthesis.Arguments>
-                </Parenthesis>
-              </Assignment.Value>
-              <Assignment.Terminator>
-                <NoPrint Line="3" Column="20" Text=";" />
-              </Assignment.Terminator>
-            </Assignment>
-            <Assignment Line="4" Column="4" Text="=">
-              <Assignment.LValue>
-                <Var Line="4" Column="2" Text="">
-                  <Var.Name>
-                    <Name Line="4" Column="2" Text="">
-                      <Name.Ids>
-                        <Id Line="4" Column="2" Text="C" />
-                      </Name.Ids>
-                    </Name>
-                  </Var.Name>
-                </Var>
-              </Assignment.LValue>
-              <Assignment.Value>
-                <Parenthesis Line="4" Column="17" Text="(">
-                  <Parenthesis.Operand>
-                    <Var Line="4" Column="6" Text="">
-                      <Var.Name>
-                        <Name Line="4" Column="6" Text="">
-                          <Name.Ids>
-                            <Id Line="4" Column="6" Text="sideLengths" />
-                          </Name.Ids>
-                        </Name>
-                      </Var.Name>
-                    </Var>
-                  </Parenthesis.Operand>
-                  <Parenthesis.Arguments>
-                    <Real Line="4" Column="18" Text="3" />
-                  </Parenthesis.Arguments>
-                </Parenthesis>
-              </Assignment.Value>
-              <Assignment.Terminator>
-                <NoPrint Line="4" Column="20" Text=";" />
-              </Assignment.Terminator>
-            </Assignment>
-            <If Line="5" Column="2" Text="if">
-              <If.IfPart>
-                <IfPart Line="5" Column="2" Text="if">
-                  <IfPart.Expression>
-                    <ShortAnd Line="5" Column="29" Text="&amp;&amp;">
-                      <ShortAnd.LeftOperand>
-                        <ShortAnd Line="5" Column="16" Text="&amp;&amp;">
-                          <ShortAnd.LeftOperand>
-                            <Gt Line="5" Column="11" Text="&gt;">
-                              <Gt.LeftOperand>
-                                <Plus Line="5" Column="8" Text="+">
-                                  <Plus.LeftOperand>
-                                    <Var Line="5" Column="7" Text="">
-                                      <Var.Name>
-                                        <Name Line="5" Column="7" Text="">
-                                          <Name.Ids>
-                                            <Id Line="5" Column="7" Text="A" />
-                                          </Name.Ids>
-                                        </Name>
-                                      </Var.Name>
-                                    </Var>
-                                  </Plus.LeftOperand>
-                                  <Plus.RightOperand>
-                                    <Var Line="5" Column="9" Text="">
-                                      <Var.Name>
-                                        <Name Line="5" Column="9" Text="">
-                                          <Name.Ids>
-                                            <Id Line="5" Column="9" Text="B" />
-                                          </Name.Ids>
-                                        </Name>
-                                      </Var.Name>
-                                    </Var>
-                                  </Plus.RightOperand>
-                                </Plus>
-                              </Gt.LeftOperand>
-                              <Gt.RightOperand>
-                                <Var Line="5" Column="13" Text="">
-                                  <Var.Name>
-                                    <Name Line="5" Column="13" Text="">
-                                      <Name.Ids>
-                                        <Id Line="5" Column="13" Text="C" />
-                                      </Name.Ids>
-                                    </Name>
-                                  </Var.Name>
-                                </Var>
-                              </Gt.RightOperand>
-                            </Gt>
-                          </ShortAnd.LeftOperand>
-                          <ShortAnd.RightOperand>
-                            <Gt Line="5" Column="24" Text="&gt;">
-                              <Gt.LeftOperand>
-                                <Plus Line="5" Column="21" Text="+">
-                                  <Plus.LeftOperand>
-                                    <Var Line="5" Column="20" Text="">
-                                      <Var.Name>
-                                        <Name Line="5" Column="20" Text="">
-                                          <Name.Ids>
-                                            <Id Line="5" Column="20" Text="B" />
-                                          </Name.Ids>
-                                        </Name>
-                                      </Var.Name>
-                                    </Var>
-                                  </Plus.LeftOperand>
-                                  <Plus.RightOperand>
-                                    <Var Line="5" Column="22" Text="">
-                                      <Var.Name>
-                                        <Name Line="5" Column="22" Text="">
-                                          <Name.Ids>
-                                            <Id Line="5" Column="22" Text="C" />
-                                          </Name.Ids>
-                                        </Name>
-                                      </Var.Name>
-                                    </Var>
-                                  </Plus.RightOperand>
-                                </Plus>
-                              </Gt.LeftOperand>
-                              <Gt.RightOperand>
-                                <Var Line="5" Column="26" Text="">
-                                  <Var.Name>
-                                    <Name Line="5" Column="26" Text="">
-                                      <Name.Ids>
-                                        <Id Line="5" Column="26" Text="A" />
-                                      </Name.Ids>
-                                    </Name>
-                                  </Var.Name>
-                                </Var>
-                              </Gt.RightOperand>
-                            </Gt>
-                          </ShortAnd.RightOperand>
-                        </ShortAnd>
-                      </ShortAnd.LeftOperand>
-                      <ShortAnd.RightOperand>
-                        <Gt Line="5" Column="37" Text="&gt;">
-                          <Gt.LeftOperand>
-                            <Plus Line="5" Column="34" Text="+">
-                              <Plus.LeftOperand>
-                                <Var Line="5" Column="33" Text="">
-                                  <Var.Name>
-                                    <Name Line="5" Column="33" Text="">
-                                      <Name.Ids>
-                                        <Id Line="5" Column="33" Text="C" />
-                                      </Name.Ids>
-                                    </Name>
-                                  </Var.Name>
-                                </Var>
-                              </Plus.LeftOperand>
-                              <Plus.RightOperand>
-                                <Var Line="5" Column="35" Text="">
-                                  <Var.Name>
-                                    <Name Line="5" Column="35" Text="">
-                                      <Name.Ids>
-                                        <Id Line="5" Column="35" Text="A" />
-                                      </Name.Ids>
-                                    </Name>
-                                  </Var.Name>
-                                </Var>
-                              </Plus.RightOperand>
-                            </Plus>
-                          </Gt.LeftOperand>
-                          <Gt.RightOperand>
-                            <Var Line="5" Column="39" Text="">
-                              <Var.Name>
-                                <Name Line="5" Column="39" Text="">
-                                  <Name.Ids>
-                                    <Id Line="5" Column="39" Text="B" />
-                                  </Name.Ids>
-                                </Name>
-                              </Var.Name>
-                            </Var>
-                          </Gt.RightOperand>
-                        </Gt>
-                      </ShortAnd.RightOperand>
-                    </ShortAnd>
-                  </IfPart.Expression>
-                  <IfPart.Statements>
-                    <If Line="6" Column="3" Text="if">
-                      <If.IfPart>
-                        <IfPart Line="6" Column="3" Text="if">
-                          <IfPart.Expression>
-                            <ShortAnd Line="6" Column="28" Text="&amp;&amp;">
-                              <ShortAnd.LeftOperand>
-                                <ShortAnd Line="6" Column="16" Text="&amp;&amp;">
-                                  <ShortAnd.LeftOperand>
-                                    <NotEq Line="6" Column="10" Text="~=">
-                                      <NotEq.LeftOperand>
-                                        <Var Line="6" Column="8" Text="">
-                                          <Var.Name>
-                                            <Name Line="6" Column="8" Text="">
-                                              <Name.Ids>
-                                                <Id Line="6" Column="8" Text="A" />
-                                              </Name.Ids>
-                                            </Name>
-                                          </Var.Name>
-                                        </Var>
-                                      </NotEq.LeftOperand>
-                                      <NotEq.RightOperand>
-                                        <Var Line="6" Column="13" Text="">
-                                          <Var.Name>
-                                            <Name Line="6" Column="13" Text="">
-                                              <Name.Ids>
-                                                <Id Line="6" Column="13" Text="B" />
-                                              </Name.Ids>
-                                            </Name>
-                                          </Var.Name>
-                                        </Var>
-                                      </NotEq.RightOperand>
-                                    </NotEq>
-                                  </ShortAnd.LeftOperand>
-                                  <ShortAnd.RightOperand>
-                                    <NotEq Line="6" Column="22" Text="~=">
-                                      <NotEq.LeftOperand>
-                                        <Var Line="6" Column="20" Text="">
-                                          <Var.Name>
-                                            <Name Line="6" Column="20" Text="">
-                                              <Name.Ids>
-                                                <Id Line="6" Column="20" Text="B" />
-                                              </Name.Ids>
-                                            </Name>
-                                          </Var.Name>
-                                        </Var>
-                                      </NotEq.LeftOperand>
-                                      <NotEq.RightOperand>
-                                        <Var Line="6" Column="25" Text="">
-                                          <Var.Name>
-                                            <Name Line="6" Column="25" Text="">
-                                              <Name.Ids>
-                                                <Id Line="6" Column="25" Text="C" />
-                                              </Name.Ids>
-                                            </Name>
-                                          </Var.Name>
-                                        </Var>
-                                      </NotEq.RightOperand>
-                                    </NotEq>
-                                  </ShortAnd.RightOperand>
-                                </ShortAnd>
-                              </ShortAnd.LeftOperand>
-                              <ShortAnd.RightOperand>
-                                <NotEq Line="6" Column="34" Text="~=">
-                                  <NotEq.LeftOperand>
-                                    <Var Line="6" Column="32" Text="">
-                                      <Var.Name>
-                                        <Name Line="6" Column="32" Text="">
-                                          <Name.Ids>
-                                            <Id Line="6" Column="32" Text="C" />
-                                          </Name.Ids>
-                                        </Name>
-                                      </Var.Name>
-                                    </Var>
-                                  </NotEq.LeftOperand>
-                                  <NotEq.RightOperand>
-                                    <Var Line="6" Column="37" Text="">
-                                      <Var.Name>
-                                        <Name Line="6" Column="37" Text="">
-                                          <Name.Ids>
-                                            <Id Line="6" Column="37" Text="A" />
-                                          </Name.Ids>
-                                        </Name>
-                                      </Var.Name>
-                                    </Var>
-                                  </NotEq.RightOperand>
-                                </NotEq>
-                              </ShortAnd.RightOperand>
-                            </ShortAnd>
-                          </IfPart.Expression>
-                          <IfPart.Statements>
-                            <Assignment Line="7" Column="9" Text="=">
-                              <Assignment.LValue>
-                                <Var Line="7" Column="4" Text="">
-                                  <Var.Name>
-                                    <Name Line="7" Column="4" Text="">
-                                      <Name.Ids>
-                                        <Id Line="7" Column="4" Text="type" />
-                                      </Name.Ids>
-                                    </Name>
-                                  </Var.Name>
-                                </Var>
-                              </Assignment.LValue>
-                              <Assignment.Value>
-                                <String Line="7" Column="11" Text="'Scalene'" />
-                              </Assignment.Value>
-                              <Assignment.Terminator>
-                                <NoPrint Line="7" Column="20" Text=";" />
-                              </Assignment.Terminator>
-                            </Assignment>
-                          </IfPart.Statements>
-                        </IfPart>
-                      </If.IfPart>
-                      <If.ElsePart>
-                        <ElsePart Line="8" Column="3" Text="else">
-                          <ElsePart.Statements>
-                            <If Line="9" Column="3" Text="if">
-                              <If.IfPart>
-                                <IfPart Line="9" Column="3" Text="if">
-                                  <IfPart.Expression>
-                                    <ShortOr Line="9" Column="56" Text="||">
-                                      <ShortOr.LeftOperand>
-                                        <ShortOr Line="9" Column="30" Text="||">
-                                          <ShortOr.LeftOperand>
-                                            <ShortAnd Line="9" Column="17" Text="&amp;&amp;">
-                                              <ShortAnd.LeftOperand>
-                                                <Eq Line="9" Column="11" Text="==">
-                                                  <Eq.LeftOperand>
-                                                    <Var Line="9" Column="9" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="9" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="9" Text="A" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </Eq.LeftOperand>
-                                                  <Eq.RightOperand>
-                                                    <Var Line="9" Column="14" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="14" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="14" Text="B" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </Eq.RightOperand>
-                                                </Eq>
-                                              </ShortAnd.LeftOperand>
-                                              <ShortAnd.RightOperand>
-                                                <NotEq Line="9" Column="23" Text="~=">
-                                                  <NotEq.LeftOperand>
-                                                    <Var Line="9" Column="21" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="21" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="21" Text="B" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </NotEq.LeftOperand>
-                                                  <NotEq.RightOperand>
-                                                    <Var Line="9" Column="26" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="26" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="26" Text="C" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </NotEq.RightOperand>
-                                                </NotEq>
-                                              </ShortAnd.RightOperand>
-                                            </ShortAnd>
-                                          </ShortOr.LeftOperand>
-                                          <ShortOr.RightOperand>
-                                            <ShortAnd Line="9" Column="43" Text="&amp;&amp;">
-                                              <ShortAnd.LeftOperand>
-                                                <Eq Line="9" Column="37" Text="==">
-                                                  <Eq.LeftOperand>
-                                                    <Var Line="9" Column="35" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="35" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="35" Text="B" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </Eq.LeftOperand>
-                                                  <Eq.RightOperand>
-                                                    <Var Line="9" Column="40" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="40" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="40" Text="C" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </Eq.RightOperand>
-                                                </Eq>
-                                              </ShortAnd.LeftOperand>
-                                              <ShortAnd.RightOperand>
-                                                <NotEq Line="9" Column="49" Text="~=">
-                                                  <NotEq.LeftOperand>
-                                                    <Var Line="9" Column="47" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="47" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="47" Text="C" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </NotEq.LeftOperand>
-                                                  <NotEq.RightOperand>
-                                                    <Var Line="9" Column="52" Text="">
-                                                      <Var.Name>
-                                                        <Name Line="9" Column="52" Text="">
-                                                          <Name.Ids>
-                                                            <Id Line="9" Column="52" Text="A" />
-                                                          </Name.Ids>
-                                                        </Name>
-                                                      </Var.Name>
-                                                    </Var>
-                                                  </NotEq.RightOperand>
-                                                </NotEq>
-                                              </ShortAnd.RightOperand>
-                                            </ShortAnd>
-                                          </ShortOr.RightOperand>
-                                        </ShortOr>
-                                      </ShortOr.LeftOperand>
-                                      <ShortOr.RightOperand>
-                                        <ShortAnd Line="9" Column="69" Text="&amp;&amp;">
-                                          <ShortAnd.LeftOperand>
-                                            <Eq Line="9" Column="63" Text="==">
-                                              <Eq.LeftOperand>
-                                                <Var Line="9" Column="61" Text="">
-                                                  <Var.Name>
-                                                    <Name Line="9" Column="61" Text="">
-                                                      <Name.Ids>
-                                                        <Id Line="9" Column="61" Text="C" />
-                                                      </Name.Ids>
-                                                    </Name>
-                                                  </Var.Name>
-                                                </Var>
-                                              </Eq.LeftOperand>
-                                              <Eq.RightOperand>
-                                                <Var Line="9" Column="66" Text="">
-                                                  <Var.Name>
-                                                    <Name Line="9" Column="66" Text="">
-                                                      <Name.Ids>
-                                                        <Id Line="9" Column="66" Text="A" />
-                                                      </Name.Ids>
-                                                    </Name>
-                                                  </Var.Name>
-                                                </Var>
-                                              </Eq.RightOperand>
-                                            </Eq>
-                                          </ShortAnd.LeftOperand>
-                                          <ShortAnd.RightOperand>
-                                            <NotEq Line="9" Column="75" Text="~=">
-                                              <NotEq.LeftOperand>
-                                                <Var Line="9" Column="73" Text="">
-                                                  <Var.Name>
-                                                    <Name Line="9" Column="73" Text="">
-                                                      <Name.Ids>
-                                                        <Id Line="9" Column="73" Text="A" />
-                                                      </Name.Ids>
-                                                    </Name>
-                                                  </Var.Name>
-                                                </Var>
-                                              </NotEq.LeftOperand>
-                                              <NotEq.RightOperand>
-                                                <Var Line="9" Column="78" Text="">
-                                                  <Var.Name>
-                                                    <Name Line="9" Column="78" Text="">
-                                                      <Name.Ids>
-                                                        <Id Line="9" Column="78" Text="B" />
-                                                      </Name.Ids>
-                                                    </Name>
-                                                  </Var.Name>
-                                                </Var>
-                                              </NotEq.RightOperand>
-                                            </NotEq>
-                                          </ShortAnd.RightOperand>
-                                        </ShortAnd>
-                                      </ShortOr.RightOperand>
-                                    </ShortOr>
-                                  </IfPart.Expression>
-                                  <IfPart.Statements>
-                                    <Assignment Line="10" Column="9" Text="=">
-                                      <Assignment.LValue>
-                                        <Var Line="10" Column="4" Text="">
-                                          <Var.Name>
-                                            <Name Line="10" Column="4" Text="">
-                                              <Name.Ids>
-                                                <Id Line="10" Column="4" Text="type" />
-                                              </Name.Ids>
-                                            </Name>
-                                          </Var.Name>
-                                        </Var>
-                                      </Assignment.LValue>
-                                      <Assignment.Value>
-                                        <String Line="10" Column="11" Text="'Isosceles'" />
-                                      </Assignment.Value>
-                                      <Assignment.Terminator>
-                                        <NoPrint Line="10" Column="22" Text=";" />
-                                      </Assignment.Terminator>
-                                    </Assignment>
-                                  </IfPart.Statements>
-                                </IfPart>
-                              </If.IfPart>
-                              <If.ElsePart>
-                                <ElsePart Line="11" Column="3" Text="else">
-                                  <ElsePart.Statements>
-                                    <Assignment Line="12" Column="9" Text="=">
-                                      <Assignment.LValue>
-                                        <Var Line="12" Column="4" Text="">
-                                          <Var.Name>
-                                            <Name Line="12" Column="4" Text="">
-                                              <Name.Ids>
-                                                <Id Line="12" Column="4" Text="type" />
-                                              </Name.Ids>
-                                            </Name>
-                                          </Var.Name>
-                                        </Var>
-                                      </Assignment.LValue>
-                                      <Assignment.Value>
-                                        <String Line="12" Column="11" Text="'Equilateral'" />
-                                      </Assignment.Value>
-                                      <Assignment.Terminator>
-                                        <NoPrint Line="12" Column="24" Text=";" />
-                                      </Assignment.Terminator>
-                                    </Assignment>
-                                  </ElsePart.Statements>
-                                </ElsePart>
-                              </If.ElsePart>
-                              <If.Terminator>
-                                <Print Line="13" Column="6" Text="&#xD;&#xA;" />
-                              </If.Terminator>
-                            </If>
-                          </ElsePart.Statements>
-                        </ElsePart>
-                      </If.ElsePart>
-                      <If.Terminator>
-                        <Print Line="14" Column="5" Text="&#xD;&#xA;" />
-                      </If.Terminator>
-                    </If>
-                  </IfPart.Statements>
-                </IfPart>
-              </If.IfPart>
-              <If.ElsePart>
-                <ElsePart Line="15" Column="2" Text="else">
-                  <ElsePart.Statements>
-                    <Assignment Line="16" Column="8" Text="=">
+                  </SwitchPart.Expression>
+                </SwitchPart>
+              </Switch.SwitchPart>
+              <Switch.CaseParts>
+                <CasePart Line="4" Column="3" Text="case">
+                  <CasePart.Expression>
+                    <Real Line="4" Column="8" Text="1" />
+                  </CasePart.Expression>
+                  <CasePart.Statements>
+                    <Assignment Line="6" Column="14" Text="=">
                       <Assignment.LValue>
-                        <Var Line="16" Column="3" Text="">
+                        <Var Line="6" Column="4" Text="">
                           <Var.Name>
-                            <Name Line="16" Column="3" Text="">
+                            <Name Line="6" Column="4" Text="">
                               <Name.Ids>
-                                <Id Line="16" Column="3" Text="type" />
+                                <Id Line="6" Column="4" Text="branchVal" />
                               </Name.Ids>
                             </Name>
                           </Var.Name>
                         </Var>
                       </Assignment.LValue>
                       <Assignment.Value>
-                        <String Line="16" Column="10" Text="'Not a triangle'" />
+                        <Minus Line="6" Column="29" Text="-">
+                          <Minus.LeftOperand>
+                            <Parenthesis Line="6" Column="25" Text="(">
+                              <Parenthesis.Operand>
+                                <Var Line="6" Column="16" Text="">
+                                  <Var.Name>
+                                    <Name Line="6" Column="16" Text="">
+                                      <Name.Ids>
+                                        <Id Line="6" Column="16" Text="predicate" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Parenthesis.Operand>
+                              <Parenthesis.Arguments>
+                                <Real Line="6" Column="26" Text="1" />
+                              </Parenthesis.Arguments>
+                            </Parenthesis>
+                          </Minus.LeftOperand>
+                          <Minus.RightOperand>
+                            <Parenthesis Line="6" Column="40" Text="(">
+                              <Parenthesis.Operand>
+                                <Var Line="6" Column="31" Text="">
+                                  <Var.Name>
+                                    <Name Line="6" Column="31" Text="">
+                                      <Name.Ids>
+                                        <Id Line="6" Column="31" Text="predicate" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Parenthesis.Operand>
+                              <Parenthesis.Arguments>
+                                <Real Line="6" Column="41" Text="2" />
+                              </Parenthesis.Arguments>
+                            </Parenthesis>
+                          </Minus.RightOperand>
+                        </Minus>
                       </Assignment.Value>
                       <Assignment.Terminator>
-                        <NoPrint Line="16" Column="26" Text=";" />
+                        <NoPrint Line="6" Column="43" Text=";" />
                       </Assignment.Terminator>
                     </Assignment>
-                  </ElsePart.Statements>
-                </ElsePart>
-              </If.ElsePart>
+                  </CasePart.Statements>
+                </CasePart>
+                <CasePart Line="7" Column="3" Text="case">
+                  <CasePart.Expression>
+                    <Real Line="7" Column="8" Text="2" />
+                  </CasePart.Expression>
+                  <CasePart.Statements>
+                    <Assignment Line="9" Column="14" Text="=">
+                      <Assignment.LValue>
+                        <Var Line="9" Column="4" Text="">
+                          <Var.Name>
+                            <Name Line="9" Column="4" Text="">
+                              <Name.Ids>
+                                <Id Line="9" Column="4" Text="branchVal" />
+                              </Name.Ids>
+                            </Name>
+                          </Var.Name>
+                        </Var>
+                      </Assignment.LValue>
+                      <Assignment.Value>
+                        <Minus Line="9" Column="29" Text="-">
+                          <Minus.LeftOperand>
+                            <Parenthesis Line="9" Column="25" Text="(">
+                              <Parenthesis.Operand>
+                                <Var Line="9" Column="16" Text="">
+                                  <Var.Name>
+                                    <Name Line="9" Column="16" Text="">
+                                      <Name.Ids>
+                                        <Id Line="9" Column="16" Text="predicate" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Parenthesis.Operand>
+                              <Parenthesis.Arguments>
+                                <Real Line="9" Column="26" Text="1" />
+                              </Parenthesis.Arguments>
+                            </Parenthesis>
+                          </Minus.LeftOperand>
+                          <Minus.RightOperand>
+                            <Parenthesis Line="9" Column="40" Text="(">
+                              <Parenthesis.Operand>
+                                <Var Line="9" Column="31" Text="">
+                                  <Var.Name>
+                                    <Name Line="9" Column="31" Text="">
+                                      <Name.Ids>
+                                        <Id Line="9" Column="31" Text="predicate" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Parenthesis.Operand>
+                              <Parenthesis.Arguments>
+                                <Real Line="9" Column="41" Text="2" />
+                              </Parenthesis.Arguments>
+                            </Parenthesis>
+                          </Minus.RightOperand>
+                        </Minus>
+                      </Assignment.Value>
+                      <Assignment.Terminator>
+                        <NoPrint Line="9" Column="43" Text=";" />
+                      </Assignment.Terminator>
+                    </Assignment>
+                  </CasePart.Statements>
+                </CasePart>
+                <CasePart Line="10" Column="3" Text="case">
+                  <CasePart.Expression>
+                    <Real Line="10" Column="8" Text="3" />
+                  </CasePart.Expression>
+                  <CasePart.Statements>
+                    <Assignment Line="12" Column="14" Text="=">
+                      <Assignment.LValue>
+                        <Var Line="12" Column="4" Text="">
+                          <Var.Name>
+                            <Name Line="12" Column="4" Text="">
+                              <Name.Ids>
+                                <Id Line="12" Column="4" Text="branchVal" />
+                              </Name.Ids>
+                            </Name>
+                          </Var.Name>
+                        </Var>
+                      </Assignment.LValue>
+                      <Assignment.Value>
+                        <Minus Line="12" Column="29" Text="-">
+                          <Minus.LeftOperand>
+                            <Parenthesis Line="12" Column="25" Text="(">
+                              <Parenthesis.Operand>
+                                <Var Line="12" Column="16" Text="">
+                                  <Var.Name>
+                                    <Name Line="12" Column="16" Text="">
+                                      <Name.Ids>
+                                        <Id Line="12" Column="16" Text="predicate" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Parenthesis.Operand>
+                              <Parenthesis.Arguments>
+                                <Real Line="12" Column="26" Text="2" />
+                              </Parenthesis.Arguments>
+                            </Parenthesis>
+                          </Minus.LeftOperand>
+                          <Minus.RightOperand>
+                            <Parenthesis Line="12" Column="40" Text="(">
+                              <Parenthesis.Operand>
+                                <Var Line="12" Column="31" Text="">
+                                  <Var.Name>
+                                    <Name Line="12" Column="31" Text="">
+                                      <Name.Ids>
+                                        <Id Line="12" Column="31" Text="predicate" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Parenthesis.Operand>
+                              <Parenthesis.Arguments>
+                                <Real Line="12" Column="41" Text="1" />
+                              </Parenthesis.Arguments>
+                            </Parenthesis>
+                          </Minus.RightOperand>
+                        </Minus>
+                      </Assignment.Value>
+                      <Assignment.Terminator>
+                        <NoPrint Line="12" Column="43" Text=";" />
+                      </Assignment.Terminator>
+                    </Assignment>
+                  </CasePart.Statements>
+                </CasePart>
+              </Switch.CaseParts>
+              <Switch.Terminator>
+                <Print Line="13" Column="5" Text="&#xD;&#xA;" />
+              </Switch.Terminator>
+            </Switch>
+            <If Line="14" Column="2" Text="if">
+              <If.IfPart>
+                <IfPart Line="14" Column="2" Text="if">
+                  <IfPart.Expression>
+                    <ShortOr Line="14" Column="22" Text="||">
+                      <ShortOr.LeftOperand>
+                        <Eq Line="14" Column="16" Text="==">
+                          <Eq.LeftOperand>
+                            <Var Line="14" Column="7" Text="">
+                              <Var.Name>
+                                <Name Line="14" Column="7" Text="">
+                                  <Name.Ids>
+                                    <Id Line="14" Column="7" Text="branchNo" />
+                                  </Name.Ids>
+                                </Name>
+                              </Var.Name>
+                            </Var>
+                          </Eq.LeftOperand>
+                          <Eq.RightOperand>
+                            <Real Line="14" Column="19" Text="2" />
+                          </Eq.RightOperand>
+                        </Eq>
+                      </ShortOr.LeftOperand>
+                      <ShortOr.RightOperand>
+                        <Eq Line="14" Column="35" Text="==">
+                          <Eq.LeftOperand>
+                            <Var Line="14" Column="26" Text="">
+                              <Var.Name>
+                                <Name Line="14" Column="26" Text="">
+                                  <Name.Ids>
+                                    <Id Line="14" Column="26" Text="branchNo" />
+                                  </Name.Ids>
+                                </Name>
+                              </Var.Name>
+                            </Var>
+                          </Eq.LeftOperand>
+                          <Eq.RightOperand>
+                            <Real Line="14" Column="38" Text="3" />
+                          </Eq.RightOperand>
+                        </Eq>
+                      </ShortOr.RightOperand>
+                    </ShortOr>
+                  </IfPart.Expression>
+                  <IfPart.Statements>
+                    <If Line="15" Column="3" Text="if">
+                      <If.IfPart>
+                        <IfPart Line="15" Column="3" Text="if">
+                          <IfPart.Expression>
+                            <Lt Line="15" Column="17" Text="&lt;">
+                              <Lt.LeftOperand>
+                                <Var Line="15" Column="7" Text="">
+                                  <Var.Name>
+                                    <Name Line="15" Column="7" Text="">
+                                      <Name.Ids>
+                                        <Id Line="15" Column="7" Text="branchVal" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Lt.LeftOperand>
+                              <Lt.RightOperand>
+                                <Real Line="15" Column="19" Text="0" />
+                              </Lt.RightOperand>
+                            </Lt>
+                          </IfPart.Expression>
+                          <IfPart.Statements>
+                            <Assignment Line="16" Column="14" Text="=">
+                              <Assignment.LValue>
+                                <Var Line="16" Column="4" Text="">
+                                  <Var.Name>
+                                    <Name Line="16" Column="4" Text="">
+                                      <Name.Ids>
+                                        <Id Line="16" Column="4" Text="branchVal" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Assignment.LValue>
+                              <Assignment.Value>
+                                <Minus Line="16" Column="26" Text="-">
+                                  <Minus.LeftOperand>
+                                    <Var Line="16" Column="16" Text="">
+                                      <Var.Name>
+                                        <Name Line="16" Column="16" Text="">
+                                          <Name.Ids>
+                                            <Id Line="16" Column="16" Text="branchVal" />
+                                          </Name.Ids>
+                                        </Name>
+                                      </Var.Name>
+                                    </Var>
+                                  </Minus.LeftOperand>
+                                  <Minus.RightOperand>
+                                    <Var Line="16" Column="28" Text="">
+                                      <Var.Name>
+                                        <Name Line="16" Column="28" Text="">
+                                          <Name.Ids>
+                                            <Id Line="16" Column="28" Text="k" />
+                                          </Name.Ids>
+                                        </Name>
+                                      </Var.Name>
+                                    </Var>
+                                  </Minus.RightOperand>
+                                </Minus>
+                              </Assignment.Value>
+                              <Assignment.Terminator>
+                                <NoPrint Line="16" Column="29" Text=";" />
+                              </Assignment.Terminator>
+                            </Assignment>
+                          </IfPart.Statements>
+                        </IfPart>
+                      </If.IfPart>
+                      <If.ElsePart>
+                        <ElsePart Line="17" Column="3" Text="else">
+                          <ElsePart.Statements>
+                            <Assignment Line="18" Column="14" Text="=">
+                              <Assignment.LValue>
+                                <Var Line="18" Column="4" Text="">
+                                  <Var.Name>
+                                    <Name Line="18" Column="4" Text="">
+                                      <Name.Ids>
+                                        <Id Line="18" Column="4" Text="branchVal" />
+                                      </Name.Ids>
+                                    </Name>
+                                  </Var.Name>
+                                </Var>
+                              </Assignment.LValue>
+                              <Assignment.Value>
+                                <Plus Line="18" Column="26" Text="+">
+                                  <Plus.LeftOperand>
+                                    <Var Line="18" Column="16" Text="">
+                                      <Var.Name>
+                                        <Name Line="18" Column="16" Text="">
+                                          <Name.Ids>
+                                            <Id Line="18" Column="16" Text="branchVal" />
+                                          </Name.Ids>
+                                        </Name>
+                                      </Var.Name>
+                                    </Var>
+                                  </Plus.LeftOperand>
+                                  <Plus.RightOperand>
+                                    <Var Line="18" Column="28" Text="">
+                                      <Var.Name>
+                                        <Name Line="18" Column="28" Text="">
+                                          <Name.Ids>
+                                            <Id Line="18" Column="28" Text="k" />
+                                          </Name.Ids>
+                                        </Name>
+                                      </Var.Name>
+                                    </Var>
+                                  </Plus.RightOperand>
+                                </Plus>
+                              </Assignment.Value>
+                              <Assignment.Terminator>
+                                <NoPrint Line="18" Column="29" Text=";" />
+                              </Assignment.Terminator>
+                            </Assignment>
+                          </ElsePart.Statements>
+                        </ElsePart>
+                      </If.ElsePart>
+                      <If.Terminator>
+                        <Print Line="19" Column="6" Text="&#xD;&#xA;" />
+                      </If.Terminator>
+                    </If>
+                  </IfPart.Statements>
+                </IfPart>
+              </If.IfPart>
               <If.Terminator>
-                <Print Line="17" Column="5" Text="&#xD;&#xA;" />
+                <Print Line="20" Column="5" Text="&#xD;&#xA;" />
               </If.Terminator>
             </If>
           </Function.Statements>

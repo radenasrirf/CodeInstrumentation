@@ -1,37 +1,37 @@
-function [traversedPath,type] = triangle(sideLengths)
+function [traversedPath,branchVal] = fitnessMiniMaxi(branchNo, predicate)
 traversedPath = [];
 traversedPath = [traversedPath '1 ' ];
-	A = sideLengths(1); % First side
-	B = sideLengths(2); % Second side
-	C = sideLengths(3); % Third side
-	% instrument Branch # 1
+	k = 1; % the smallest step for integer
 	traversedPath = [traversedPath '2 ' ];
-	if ((A+B > C) && (B+C > A) && (C+A > B))
+	switch (branchNo)
+		case 1,
+		traversedPath = [traversedPath '3 ' ];
+			% branch #1: (idx <= numLength)
+			branchVal = predicate(1) - predicate(2);
+		case 2,
+		traversedPath = [traversedPath '4 ' ];
+			% branch #2: (maxi < num(idx))
+			branchVal = predicate(1) - predicate(2);
+		case 3,
+		traversedPath = [traversedPath '5 ' ];
+			% branch #3: (mini > num(idx))
+			branchVal = predicate(2) - predicate(1);
+	end
+	% instrument Branch # 1
+	traversedPath = [traversedPath '6 ' ];
+	if ((branchNo == 2) || (branchNo == 3)),
 		traversedPath = [traversedPath '(T) ' ];
 		% instrument Branch # 2
-		traversedPath = [traversedPath '3 ' ];
-		if ((A ~= B) && (B ~= C) && (C ~= A))
+		traversedPath = [traversedPath '7 ' ];
+		if (branchVal < 0)
 			traversedPath = [traversedPath '(T) ' ];
-			traversedPath = [traversedPath '4 ' ];
-			type = 'Scalene';
-		else
-		traversedPath = [traversedPath '(F) ' ];
-		% instrument Branch # 3
-		traversedPath = [traversedPath '5 ' ];
-		if (((A == B) && (B ~= C)) || ((B == C) && (C ~= A)) || ((C == A) && (A ~= B)))
-			traversedPath = [traversedPath '(T) ' ];
-			traversedPath = [traversedPath '6 ' ];
-			type = 'Isosceles';
+			traversedPath = [traversedPath '8 ' ];
+			branchVal = branchVal - k;
 		else
 			traversedPath = [traversedPath '(F) ' ];
-			traversedPath = [traversedPath '7 ' ];
-			type = 'Equilateral';
+			traversedPath = [traversedPath '9 ' ];
+			branchVal = branchVal + k;
 		end
 	end
-	else
-		traversedPath = [traversedPath '(F) ' ];
-		traversedPath = [traversedPath '9 ' ];
-		type = 'Not a triangle';
-	end
-traversedPath = [traversedPath '8 ' ];
+traversedPath = [traversedPath '10 ' ];
 end

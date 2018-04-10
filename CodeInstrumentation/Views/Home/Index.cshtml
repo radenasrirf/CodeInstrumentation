@@ -10,20 +10,56 @@
             </div>
         </div>
     <hr />*@
-@using (Html.BeginForm())
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
+
+    @Html.Hidden("type")
     <div class="row">
         <div class="col-md-12">
             <div class="box box-success">
                 <div class="box-header">
-                    <h3 class="box-title text-center"><i class="glyphicon glyphicon-align-left"></i> &nbsp; Source Code</h3>
+                    <h3 class="box-title text-center"><i class="fa fa-align-left"></i> &nbsp; Source Code</h3>
                 </div>
                 <div class="box-body">
-                    <textarea class="form-control textarea" id="SourceCode" name="SourceCode" rows="@ViewBag.Line" style="min-width: calc(100% - 60px);">@ViewBag.Code</textarea>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @if (ViewBag.Error != null)
+                            {
+                                <div class="alert alert-danger">
+                                    <p>@Html.Raw(ViewBag.Error)</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" style="max-width:400px">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input form-control" id="fileButton" name="file" accept=".m">
+                                    <label class="custom-file-label" for="inputGroupFile04" id="fileName" style="background-color:#f1f3f5;font-size:smaller"><i class="fa fa-folder-open-o"></i> Choose matlab code (.m)</label>
+                                </div>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit" id="upload"><i class="fa fa-upload"></i> Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="max-width:400px">
+                        <div class="col-md-12" style="font-size:smaller">
+                            Or type matlab code
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea class="form-control textarea" id="SourceCode" name="SourceCode" rows="@ViewBag.Line" style="min-width: calc(100% - 60px);">@ViewBag.Code</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 text-right">
+                            <button type="submit" class="btn btn-primary" id="upload"><i class="fa fa-spinner"></i> Process</button>
+                        </div>
+                    </div>
                 </div><!-- /.box-body-->
-                <div class="box-footer text-right">
-                    <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-refresh"></i> Process</button>
-                </div>
             </div><!-- /.box -->
         </div>
     </div>
@@ -36,10 +72,29 @@
             <div class="col-md-12">
                 <div class="box box-primary">
                     <div class="box-header">
-                        <h3 class="box-title text-center"><i class="glyphicon glyphicon-align-left"></i> &nbsp; Instrumented Source Code</h3>
+                        <h3 class="box-title text-center"><i class="fa fa-align-left"></i> &nbsp; Instrumented Source Code</h3>
                     </div>
                     <div class="box-body">
-                        <textarea class="form-control textarea" readonly rows="@ViewBag.LineResult" style="min-width: calc(100% - 60px); cursor: text;">@ViewBag.InstrumentedCode</textarea>
+
+                        @using (Html.BeginForm("Download", "Home"))
+                        {
+                            @Html.Hidden("InstrumentedFilePath", (object)ViewBag.InstrumentedFilePath)
+                            <div class="form-group">
+                                <div class="col-md-12 text-right">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-primary" id="copy"><i class="fa fa-files-o"></i> Copy</button>
+                                        <button class="btn btn-success" type="submit">
+                                            <i class="fa fa-download"></i> Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <textarea class="form-control textarea" readonly rows="@ViewBag.LineResult" style="min-width: calc(100% - 60px); cursor: text;" id="instrumented">@ViewBag.InstrumentedCode</textarea>
+                            </div>
+                        </div>
                     </div><!-- /.box-body-->
                 </div><!-- /.box -->
             </div>
@@ -48,7 +103,7 @@
             <div class="col-md-7">
                 <div class="box box-primary">
                     <div class="box-header">
-                        <h3 class="box-title text-center"><i class="glyphicon glyphicon-picture"></i> &nbsp; Control Flow Graph</h3>
+                        <h3 class="box-title text-center"><i class="fa fa-picture-o"></i> &nbsp; Control Flow Graph</h3>
                     </div>
                     <div class="box-body">
                         <center>
@@ -62,7 +117,7 @@
                     <div class="col-md-12">
                         <div class="box box-success">
                             <div class="box-header">
-                                <h3 class="box-title"><i class="glyphicon glyphicon-info-sign"></i> &nbsp; Information</h3>
+                                <h3 class="box-title"><i class="fa fa-info-circle"></i> &nbsp; Information</h3>
                             </div>
                             <div class="box-body">
                                 <pre style="font-size:70%;">@Html.Raw(ViewBag.InformationCFG)</pre>
@@ -72,26 +127,26 @@
                 </div>
 
                 @*<div class="row">
-                    <div class="col-md-12">
-                        <div class="box box-success">
-                            <div class="box-header">
-                                <h3 class="box-title"><i class="glyphicon glyphicon-info-sign"></i> &nbsp; Information</h3>
-                            </div>
-                            <div class="box-body">
-                                <pre style="font-size:80%;">@Html.Raw(ViewBag.Dot)</pre>
-                            </div><!-- /.box-body-->
-                        </div><!-- /.box -->
-                    </div>
-                </div>*@
+                        <div class="col-md-12">
+                            <div class="box box-success">
+                                <div class="box-header">
+                                    <h3 class="box-title"><i class="glyphicon glyphicon-info-sign"></i> &nbsp; Information</h3>
+                                </div>
+                                <div class="box-body">
+                                    <pre style="font-size:80%;">@Html.Raw(ViewBag.Dot)</pre>
+                                </div><!-- /.box-body-->
+                            </div><!-- /.box -->
+                        </div>
+                    </div>*@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="box box-success">
                             <div class="box-header">
-                                <h3 class="box-title"><i class="glyphicon glyphicon-info-sign"></i> &nbsp; Cyclomatic Complexity</h3>
+                                <h3 class="box-title"><i class="fa fa-info-circle"></i> &nbsp; Cyclomatic Complexity</h3>
                             </div>
                             <div class="box-body">
-                                N(G) = @ViewBag.NodesCount<br/>
-                                E(G) = @ViewBag.EdgesCount<br/>
+                                N(G) = @ViewBag.NodesCount<br />
+                                E(G) = @ViewBag.EdgesCount<br />
                                 V(G) = E - N + 2<br />
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= @(ViewBag.EdgesCount - ViewBag.NodesCount + 2)
                             </div><!-- /.box-body-->
@@ -102,7 +157,7 @@
                     <div class="col-md-12">
                         <div class="box box-danger">
                             <div class="box-header">
-                                <h3 class="box-title"><i class="glyphicon glyphicon-list"></i> &nbsp;  Path</h3>
+                                <h3 class="box-title"><i class="fa fa-list-ul"></i>  &nbsp;  Path</h3>
                             </div>
                             <div class="box-body">
                                 <ol>
@@ -119,25 +174,25 @@
 
 
                 @*<div class="row">
-                    <div class="col-md-12">
-                        <div class="box box-danger">
-                            <div class="box-header">
-                                <h3 class="box-title"><i class="glyphicon glyphicon-list"></i> &nbsp;  Path</h3>
-                            </div>
-                            <div class="box-body">
-                                <ul>
-                                    @foreach (string item in ViewBag.AdjacencyList)
-                                    {
-                                        <li>@item</li>
-                                    }
-                                </ul>
-                            </div><!-- /.box-body-->
-                        </div><!-- /.box -->
-                    </div>
-                </div>*@
+                        <div class="col-md-12">
+                            <div class="box box-danger">
+                                <div class="box-header">
+                                    <h3 class="box-title"><i class="glyphicon glyphicon-list"></i> &nbsp;  Path</h3>
+                                </div>
+                                <div class="box-body">
+                                    <ul>
+                                        @foreach (string item in ViewBag.AdjacencyList)
+                                        {
+                                            <li>@item</li>
+                                        }
+                                    </ul>
+                                </div><!-- /.box-body-->
+                            </div><!-- /.box -->
+                        </div>
+                    </div>*@
             </div>
         </div>
-        
+
     }
     else
     {
@@ -150,6 +205,22 @@
     $(function () {
         // Target a single one
         $(".textarea").linedtextarea();
-
+        $("#fileButton").change(function () {
+            document.getElementById("fileName").innerText = this.value.substring(12);
+        });
+        $("#upload").click(function () {
+            $("#type").val("file");
+            return true;
+        });
+        $("#submit").click(function () {
+            $("#type").val("text");
+            return true;
+        });
+        $("#copy").click(function () {
+            var copyText = document.getElementById("instrumented");
+            copyText.select();
+            document.execCommand("Copy");
+            //$("[data-toggle='popover']").popover('hide');
+        });
     });
 </script>

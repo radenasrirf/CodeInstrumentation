@@ -1,18 +1,21 @@
-function type = triangle(sideLengths)
-	A = sideLengths(1); % First side
-	B = sideLengths(2); % Second side
-	C = sideLengths(3); % Third side
-	if ((A+B > C) && (B+C > A) && (C+A > B))
-		if ((A ~= B) && (B ~= C) && (C ~= A))
-			type = 'Scalene';
-		else
-		if (((A == B) && (B ~= C)) || ((B == C) && (C ~= A)) || ((C == A) && (A ~= B)))
-			type = 'Isosceles';
-		else
-			type = 'Equilateral';
-		end
+function branchVal = fitnessMiniMaxi(branchNo, predicate)
+	k = 1; % the smallest step for integer
+	switch (branchNo)
+		case 1,
+			% branch #1: (idx <= numLength)
+			branchVal = predicate(1) - predicate(2);
+		case 2,
+			% branch #2: (maxi < num(idx))
+			branchVal = predicate(1) - predicate(2);
+		case 3,
+			% branch #3: (mini > num(idx))
+			branchVal = predicate(2) - predicate(1);
 	end
-	else
-		type = 'Not a triangle';
+	if ((branchNo == 2) || (branchNo == 3)),
+		if (branchVal < 0)
+			branchVal = branchVal - k;
+		else
+			branchVal = branchVal + k;
+		end
 	end
 end

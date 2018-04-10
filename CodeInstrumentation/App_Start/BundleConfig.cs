@@ -20,14 +20,22 @@ namespace CodeInstrumentation
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
+                      "~/Scripts/bootstrap.bundle.min.js",
                       "~/Scripts/jquery-linedtextarea.js",
-                      "~/Scripts/respond.js"));
+                      "~/Scripts/respond.js"
+                      ));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/jquery-linedtextarea.css",
                       "~/Content/site.css"));
+            bundles.Add(new ScriptBundle("~/bundles/fonts").Include(
+                      "~/fonts/"));
+
+            bundles.Add(new StyleBundle("~/Content/fonts").Include(
+                      "~/Content/font-awesome.min.css",
+                      "~/Content/FontOpenSans.css"));
+
         }
     }
 }

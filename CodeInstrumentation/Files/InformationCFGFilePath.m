@@ -1,18 +1,21 @@
-function type = triangle(sideLengths) <b style='color:red'>Node 1</b>
-	A = sideLengths(1); % First side
-	B = sideLengths(2); % Second side
-	C = sideLengths(3); % Third side
-	if ((A+B > C) && (B+C > A) && (C+A > B)) <b style='color:red'>Node 2</b>
-		if ((A ~= B) && (B ~= C) && (C ~= A)) <b style='color:red'>Node 3</b>
-			type = 'Scalene'; <b style='color:red'>Node 4</b>
+function branchVal = fitnessMiniMaxi(branchNo, predicate) <b style='color:red'>Node 1</b>
+	k = 1; % the smallest step for integer
+	switch (branchNo) <b style='color:red'>Node 2</b>
+		case 1,
+			% branch #1: (idx <= numLength) <b style='color:red'>Node 3</b>
+			branchVal = predicate(1) - predicate(2);
+		case 2,
+			% branch #2: (maxi < num(idx)) <b style='color:red'>Node 4</b>
+			branchVal = predicate(1) - predicate(2);
+		case 3,
+			% branch #3: (mini > num(idx)) <b style='color:red'>Node 5</b>
+			branchVal = predicate(2) - predicate(1);
+	end
+	if ((branchNo == 2) || (branchNo == 3)), <b style='color:red'>Node 6</b>
+		if (branchVal < 0) <b style='color:red'>Node 7</b>
+			branchVal = branchVal - k; <b style='color:red'>Node 8</b>
 		else
-		if (((A == B) && (B ~= C)) || ((B == C) && (C ~= A)) || ((C == A) && (A ~= B))) <b style='color:red'>Node 5</b>
-			type = 'Isosceles'; <b style='color:red'>Node 6</b>
-		else
-			type = 'Equilateral'; <b style='color:red'>Node 7</b>
+			branchVal = branchVal + k; <b style='color:red'>Node 9</b>
 		end
 	end
-	else
-		type = 'Not a triangle'; <b style='color:red'>Node 9</b>
-	end
-end <b style='color:red'>Node 8</b>
+end <b style='color:red'>Node 10</b>
