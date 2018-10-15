@@ -222,5 +222,18 @@
             document.execCommand("Copy");
             //$("[data-toggle='popover']").popover('hide');
         });
+        $("#more").click(function () {
+            var text = $(this).prev('.text');
+            text.toogleClass("summary");
+            if (text.hasClass("summary")) {
+                $(this).text("more");
+            }
+            else {
+                $(this).text("less");
+
+            }
+        });
+
+
     });
 </script>

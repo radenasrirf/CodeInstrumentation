@@ -330,3 +330,9 @@ input[type="checkbox"].input-validation-error {
   padding: 10px;
   background-color: #ffffff;
 }
+
+.summary {
+    height: 100px;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+}

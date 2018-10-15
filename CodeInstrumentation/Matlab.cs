@@ -25,6 +25,8 @@ namespace CodeInstrumentation
         public const int IF = 2;
         public const int LOOP = 3;
         public const int PROCESS = 5;
+        // Declare a new StringBuilder.
+        StringBuilder builder = new StringBuilder();
         public List<Models.Node> Node { get; set; }
         Models.Node root = new Models.Node();
         Models.Node end = new Models.Node();
@@ -79,6 +81,7 @@ namespace CodeInstrumentation
             stackOfNode.Clear();
             stackOfNode.Push(Nodes.FirstOrDefault());
             var root = Nodes.FirstOrDefault();
+            builder.Append(root.Number.ToString() + " " + root.Edges.FirstOrDefault().To.Number.ToString());
             TraversedPath(root.Edges.FirstOrDefault().To, root.Edges.FirstOrDefault(), root.Number.ToString() + " " + root.Edges.FirstOrDefault().To.Number.ToString());
         }
 
@@ -119,7 +122,10 @@ namespace CodeInstrumentation
                 {
                     if (item.isVisited == false)
                     {
+                        //var len = builder.Length;
+                        //builder.Append(" " + (item.Type != null ? "(" + item.Type.ToString().Substring(0, 1) + ")" : "") + " " + (item.To.Number == i ? "" : item.To.Number.ToString()));
                         TraversedPath(item.To, item, parentPath + " " + (item.Type != null ? "(" + item.Type.ToString().Substring(0, 1) + ")" : "") + " " + (item.To.Number == i ? "" : item.To.Number.ToString()));
+                        //builder.Remove(len,builder.Length-len);
                         item.isVisited = false;
                     }
                 }
@@ -127,6 +133,8 @@ namespace CodeInstrumentation
             else
             {
                 ListOfPath.Add(parentPath);
+                //builder.Clear();
+                //builder.Append(parentPath);
             }
         }
 
